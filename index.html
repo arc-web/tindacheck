@@ -1840,7 +1840,7 @@
         if (data.status !== 1 || !data.product) {
           populateFromScan(activeScannerIndex, barcode, null);
           await closeScanner();
-          showScanToast('Product not found — barcode added as name.');
+          showScanToast('Product not in database — please type the name.');
           return;
         }
 
@@ -1857,7 +1857,7 @@
         populateFromScan(activeScannerIndex, barcode, null);
         await new Promise(r => setTimeout(r, 1800));
         await closeScanner();
-        showScanToast('Could not look up product — barcode added as name.');
+        showScanToast('Could not look up product — please type the name.');
       }
     }
 
@@ -1915,8 +1915,11 @@
       if (!nameEl) return;
 
       if (!product) {
-        nameEl.value = fallbackBarcode || '';
-        productData[index] = { ...productData[index], name: nameEl.value };
+        // Leave name blank so the user types it — a barcode number looks broken
+        nameEl.value = '';
+        nameEl.placeholder = 'Type product name…';
+        nameEl.focus();
+        productData[index] = { ...productData[index], name: '' };
         return;
       }
 
