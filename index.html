@@ -804,6 +804,35 @@
     }
 
     /* ============================================================
+       SHOPPING CART TAB
+    ============================================================ */
+    .cart-section { padding-top: 20px; }
+    .cart-header-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .cart-count { font-size: 11px; font-weight: 600; letter-spacing: 1.2px; text-transform: uppercase; color: var(--text-3); }
+    .btn-clear-cart { font-size: 12px; font-weight: 600; color: var(--text-3); background: transparent; border: 1px solid var(--border); border-radius: 8px; padding: 6px 12px; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: color 0.15s, border-color 0.15s; }
+    .btn-clear-cart:active { color: var(--danger, #ef4444); border-color: var(--danger, #ef4444); }
+    .cart-empty { text-align: center; padding: 48px 20px; }
+    .cart-empty-icon { font-size: 36px; display: block; margin-bottom: 12px; opacity: 0.4; }
+    .cart-empty-text { font-size: 14px; color: var(--text-3); line-height: 1.6; }
+    .cart-item { display: flex; align-items: center; gap: 12px; padding: 13px 16px; background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 8px; }
+    .cart-item-info { flex: 1; min-width: 0; }
+    .cart-item-name { font-size: 15px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .cart-item-detail { font-size: 12px; color: var(--text-3); margin-top: 2px; }
+    .cart-item-price { font-size: 16px; font-weight: 700; color: var(--text); white-space: nowrap; flex-shrink: 0; }
+    .btn-cart-remove { font-size: 18px; color: var(--text-3); background: transparent; border: none; cursor: pointer; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; -webkit-tap-highlight-color: transparent; transition: color 0.15s; }
+    .btn-cart-remove:active { color: var(--danger, #ef4444); }
+    .cart-total-bar { display: flex; align-items: center; justify-content: space-between; padding: 16px 18px; background: var(--surface-2); border: 1px solid var(--border-hi); border-radius: 12px; margin-top: 12px; }
+    .cart-total-label { font-size: 13px; font-weight: 600; color: var(--text-2); text-transform: uppercase; letter-spacing: 0.8px; }
+    .cart-total-amount { font-size: 24px; font-weight: 700; color: var(--best); letter-spacing: -0.5px; }
+    .list-item-incart { font-size: 12px; color: var(--best); font-weight: 600; flex-shrink: 0; }
+
+    /* Add to Cart button on result cards */
+    .btn-add-to-cart { display: block; width: 100%; height: 44px; margin-top: 12px; background: transparent; color: var(--text-2); border: 1px solid var(--border-hi); border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.15s, color 0.15s; -webkit-tap-highlight-color: transparent; }
+    .btn-add-to-cart:active { background: var(--surface-3); }
+    .result-card.winner .btn-add-to-cart { border-color: var(--best); color: var(--best); }
+    .btn-add-to-cart.btn-cart-added, .btn-add-to-cart:disabled { background: var(--best-soft); color: var(--best); border-color: var(--best); cursor: default; opacity: 1; }
+
+    /* ============================================================
        BARCODE SCANNER
     ============================================================ */
 
@@ -1008,6 +1037,8 @@
               onclick="switchTab('compare')" role="tab" aria-selected="true">Compare</button>
       <button class="tab-btn" id="tab-btn-list"
               onclick="switchTab('list')" role="tab" aria-selected="false">My List</button>
+      <button class="tab-btn" id="tab-btn-cart"
+              onclick="switchTab('cart')" role="tab" aria-selected="false">Cart</button>
       <button class="tab-btn" id="tab-btn-history"
               onclick="switchTab('history')" role="tab" aria-selected="false">History</button>
     </nav>
@@ -1048,6 +1079,25 @@
         </div>
       </div>
 
+      <!-- CART TAB -->
+      <div id="tab-cart" class="hidden" role="tabpanel">
+        <div class="cart-section">
+          <div class="cart-header-row">
+            <div id="cart-count" class="cart-count"></div>
+            <button class="btn-clear-cart" onclick="clearCart()">Clear Cart</button>
+          </div>
+          <div id="cart-container"></div>
+          <div id="cart-total-bar" class="cart-total-bar hidden">
+            <span class="cart-total-label">Estimated Total</span>
+            <span id="cart-total-amount" class="cart-total-amount">₱0.00</span>
+          </div>
+          <div id="cart-empty" class="cart-empty">
+            <span class="cart-empty-icon">🛒</span>
+            <div class="cart-empty-text">Your cart is empty.<br>Compare products and add the best deal.</div>
+          </div>
+        </div>
+      </div>
+
       <!-- HISTORY TAB -->
       <div id="tab-history" class="hidden" role="tabpanel">
         <div class="history-section">
@@ -1074,6 +1124,8 @@
     let productData       = [{}, {}];
     let groceryList       = JSON.parse(localStorage.getItem('tindacheck-list')    || '[]');
     let comparisonHistory = JSON.parse(localStorage.getItem('tindacheck-history') || '[]');
+    let shoppingCart      = JSON.parse(localStorage.getItem('tindacheck-cart')    || '[]');
+    let currentProducts   = {}; // keyed by originalIndex, populated in compare()
 
 
     /* ============================================================
@@ -1103,12 +1155,13 @@
        TAB SWITCHING
     ============================================================ */
     function switchTab(tab) {
-      ['compare', 'list', 'history'].forEach(t => {
+      ['compare', 'list', 'cart', 'history'].forEach(t => {
         document.getElementById(`tab-${t}`).classList.toggle('hidden', t !== tab);
         document.getElementById(`tab-btn-${t}`).classList.toggle('active', t === tab);
         document.getElementById(`tab-btn-${t}`).setAttribute('aria-selected', t === tab);
       });
       if (tab === 'list')    renderList();
+      if (tab === 'cart')    renderCart();
       if (tab === 'history') renderHistory();
     }
 
@@ -1169,9 +1222,12 @@
       countEl.textContent = `${groceryList.length} item${groceryList.length !== 1 ? 's' : ''}`;
 
       groceryList.forEach((name, idx) => {
+        const inCart = shoppingCart.some(c => c.name.toLowerCase().trim() === name.toLowerCase().trim());
+        const cartBadge = inCart ? `<span class="list-item-incart">🛒 In Cart</span>` : '';
         container.insertAdjacentHTML('beforeend', `
           <div class="list-item" style="animation-delay:${idx * 0.04}s">
             <div class="list-item-name">${escapeHTML(name)}</div>
+            ${cartBadge}
             <button class="btn-list-compare"
                     onclick="compareItem(${JSON.stringify(name)})">Compare</button>
             <button class="btn-list-remove" onclick="removeListItem(${idx})"
@@ -1462,10 +1518,13 @@
           return a.perUnit - b.perUnit;
         });
 
+      // Populate currentProducts map for cart
+      currentProducts = {};
+      sorted.forEach(p => { currentProducts[p.originalIndex] = p; });
+
       sorted.forEach(p => {
         const isWinner = p.originalIndex === winnerIdx;
         const isLoser  = p.originalIndex === loserIdx;
-        const isMid    = !isWinner && !isLoser;
 
         const tierClass = isWinner ? 'winner' : isLoser ? 'loser' : 'middle';
 
@@ -1473,7 +1532,6 @@
         if (!mixedUnits) {
           if (isWinner) badge = '<span class="badge badge-winner">Best Deal</span>';
           else if (isLoser) badge = '<span class="badge badge-loser">Most Expensive</span>';
-          // middle: no badge — color alone signals it
         }
 
         const label    = unitLabel(p.family);
@@ -1489,6 +1547,13 @@
             </div>`;
         }
 
+        const inCart = shoppingCart.some(c => c.name.toLowerCase().trim() === p.name.toLowerCase().trim());
+        const cartBtn = `<button class="btn-add-to-cart${inCart ? ' btn-cart-added' : ''}"
+          onclick="handleAddToCart(this, ${p.originalIndex})"
+          ${inCart ? 'disabled' : ''}>
+          ${inCart ? '✓ In Cart' : '+ Add to Cart'}
+        </button>`;
+
         container.insertAdjacentHTML('beforeend', `
           <div class="result-card ${mixedUnits ? '' : tierClass}">
             <div class="result-card-top">
@@ -1502,6 +1567,7 @@
             </div>
             <div class="result-original">₱${p.price.toFixed(2)} · ${p.size}${p.unit} × ${p.packs} ${p.packs === 1 ? 'pack' : 'packs'}</div>
             ${savingsHTML}
+            ${cartBtn}
           </div>
         `);
       });
@@ -1581,6 +1647,88 @@
       comparisonHistory = [];
       localStorage.removeItem('tindacheck-history');
       renderHistory();
+    }
+
+
+    /* ============================================================
+       SHOPPING CART
+    ============================================================ */
+    function saveCart() {
+      localStorage.setItem('tindacheck-cart', JSON.stringify(shoppingCart));
+      updateCartBadge();
+    }
+
+    function updateCartBadge() {
+      const btn = document.getElementById('tab-btn-cart');
+      if (btn) btn.textContent = shoppingCart.length > 0 ? `Cart (${shoppingCart.length})` : 'Cart';
+    }
+
+    function addToCart(p) {
+      if (shoppingCart.some(c => c.name.toLowerCase().trim() === p.name.toLowerCase().trim())) return;
+      shoppingCart.push({
+        name: p.name, price: p.price, size: p.size, unit: p.unit,
+        packs: p.packs, perUnit: p.perUnit, family: p.family, addedAt: Date.now()
+      });
+      saveCart();
+    }
+
+    function removeFromCart(idx) {
+      shoppingCart.splice(idx, 1);
+      saveCart();
+      renderCart();
+    }
+
+    function clearCart() {
+      shoppingCart = [];
+      localStorage.removeItem('tindacheck-cart');
+      updateCartBadge();
+      renderCart();
+    }
+
+    function handleAddToCart(btn, idx) {
+      addToCart(currentProducts[idx]);
+      btn.textContent = '✓ Added!';
+      btn.classList.add('btn-cart-added');
+      btn.disabled = true;
+      setTimeout(() => { btn.textContent = '✓ In Cart'; }, 800);
+      // Also refresh My List so 🛒 badge appears
+      if (document.getElementById('tab-list') && !document.getElementById('tab-list').classList.contains('hidden')) {
+        renderList();
+      }
+    }
+
+    function renderCart() {
+      const container = document.getElementById('cart-container');
+      const emptyEl   = document.getElementById('cart-empty');
+      const totalBar  = document.getElementById('cart-total-bar');
+      const totalAmt  = document.getElementById('cart-total-amount');
+      const countEl   = document.getElementById('cart-count');
+      if (!container) return;
+      container.innerHTML = '';
+      if (shoppingCart.length === 0) {
+        emptyEl.classList.remove('hidden');
+        totalBar.classList.add('hidden');
+        countEl.textContent = '';
+        return;
+      }
+      emptyEl.classList.add('hidden');
+      totalBar.classList.remove('hidden');
+      countEl.textContent = `${shoppingCart.length} item${shoppingCart.length > 1 ? 's' : ''}`;
+      let total = 0;
+      shoppingCart.forEach((item, idx) => {
+        total += item.price;
+        const label = item.family === 'weight' ? 'per 100g' : item.family === 'volume' ? 'per 100ml' : 'per piece';
+        container.insertAdjacentHTML('beforeend', `
+          <div class="cart-item">
+            <div class="cart-item-info">
+              <div class="cart-item-name">${escapeHTML(item.name || 'Unnamed product')}</div>
+              <div class="cart-item-detail">${item.size}${item.unit} × ${item.packs} pack${item.packs > 1 ? 's' : ''} · ₱${item.perUnit.toFixed(2)} ${label}</div>
+            </div>
+            <div class="cart-item-price">₱${item.price.toFixed(2)}</div>
+            <button class="btn-cart-remove" onclick="removeFromCart(${idx})" aria-label="Remove">×</button>
+          </div>`);
+      });
+      totalAmt.textContent = `₱${total.toFixed(2)}`;
     }
 
 
@@ -1778,11 +1926,16 @@
       ).trim();
       nameEl.value = name;
 
-      const rawQty = product.quantity || product.net_weight || product.net_volume || '';
+      const rawQty = product.quantity || product.quantity_imported || product.net_weight || product.net_volume || '';
       const parsed = parseQuantity(rawQty);
-      if (parsed && sizeEl && unitEl) {
-        sizeEl.value = parsed.qty;
-        unitEl.value = parsed.unit;
+      if (sizeEl && unitEl) {
+        if (parsed) {
+          sizeEl.value = parsed.qty;
+          unitEl.value = parsed.unit;
+        } else if (rawQty) {
+          // Can't parse the format — put the raw string in as a hint
+          sizeEl.value = rawQty;
+        }
       }
 
       productData[index] = {
@@ -1822,6 +1975,7 @@
     ============================================================ */
     initTheme();
     renderProducts();
+    updateCartBadge();
 
   </script>
 
