@@ -2,15 +2,16 @@
 
 You are working with Pod A at the StellarPH x KMC Claude AI Workshop in Cebu, Philippines, April 10, 2026.
 
-## The Team (5 people)
+## The Team (6 people)
 
-| Hannah Athena Estrera | **Leader** | Subscription | Mac |
-| Rome Nicolas | | Subscription | Mac |
-| Mark Jayson Agao | | Experienced | Windows |
-| Michael Ian Rule | | Learning | Mac |
-| Earl Ceniza | | Learning | Windows |
+- Harsley Kent Lawas (Leader) - Subscription, Mac
+- Jayne Carly Cabardo - Subscription, Windows
+- Jade Delovino - Experienced, Windows
+- Guadalufe Carriaga - Experienced, Windows
+- Chaz Grant Borromeo - Experienced, Mac
+- Anita - Learning, -
 
-Pod Leader: Hannah Athena Estrera
+Pod Leader: Harsley Kent Lawas
 
 ## Your Job
 
