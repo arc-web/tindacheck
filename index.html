@@ -184,49 +184,58 @@
     }
 
     /* ============================================================
-       PRODUCT COUNT TOGGLE (2 or 3 items)
+       ADD / REMOVE PRODUCT BUTTONS
     ============================================================ */
-    .toggle-section {
+
+    /* × Remove — sits in each card header, only shown when there are > 2 cards */
+    .btn-remove-product {
+      margin-left: auto;
+      height: 32px;
+      padding: 0 10px;
+      background: transparent;
+      color: var(--gray-400);
+      border: 1px solid var(--gray-300);
+      border-radius: var(--radius-sm);
+      font-size: 20px;
+      line-height: 1;
+      cursor: pointer;
+      flex-shrink: 0;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 12px;
-      padding: 20px 0 4px;
+      transition: color 0.15s, border-color 0.15s, background 0.15s;
+      -webkit-tap-highlight-color: transparent;
     }
 
-    .toggle-label {
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--gray-600);
+    .btn-remove-product:active {
+      color: #B71C1C;
+      border-color: #EF5350;
+      background: #FFEBEE;
     }
 
-    .toggle-group {
+    /* + Add Another Item — dashed button rendered below the last card */
+    .btn-add-product {
       display: flex;
-      background: var(--gray-200);
-      border-radius: 30px;
-      padding: 3px;
-      gap: 2px;
-    }
-
-    .toggle-btn {
-      border: none;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      height: 52px;
+      margin-top: 12px;
       background: transparent;
-      padding: 8px 20px;
-      border-radius: 27px;
-      font-size: 14px;
+      color: var(--orange);
+      border: 2px dashed var(--orange);
+      border-radius: var(--radius);
+      font-size: 15px;
       font-weight: 700;
       cursor: pointer;
-      color: var(--gray-600);
-      transition: background 0.2s, color 0.2s, box-shadow 0.2s;
-      min-height: 40px;
+      letter-spacing: 0.3px;
+      transition: background 0.15s;
       -webkit-tap-highlight-color: transparent;
-      line-height: 1;
     }
 
-    .toggle-btn.active {
-      background: var(--green);
-      color: var(--orange-light);
-      box-shadow: 0 2px 8px rgba(15, 15, 26, 0.25);
+    .btn-add-product:active {
+      background: var(--orange-pale);
     }
 
     /* ============================================================
@@ -806,21 +815,12 @@
     ====================================================== -->
     <div id="tab-compare" role="tabpanel">
 
-      <div class="toggle-section">
-        <span class="toggle-label">Compare</span>
-        <div class="toggle-group" role="group" aria-label="Number of products to compare">
-          <button class="toggle-btn active" id="btn2"
-                  onclick="setProductCount(2)" aria-pressed="true">
-            2 Items
-          </button>
-          <button class="toggle-btn" id="btn3"
-                  onclick="setProductCount(3)" aria-pressed="false">
-            3 Items
-          </button>
-        </div>
-      </div>
+      <div id="products-container" style="padding-top: 16px;"></div>
 
-      <div id="products-container"></div>
+      <!-- Shown below the cards; hidden at max 5 products -->
+      <button class="btn-add-product" id="btn-add-product" onclick="addProduct()">
+        + Add Another Item
+      </button>
 
       <button class="btn-compare" onclick="compare()">
         Compare Prices
@@ -895,8 +895,10 @@
     /* ============================================================
        STATE
     ============================================================ */
-    let productCount    = 2;
-    let groceryList     = JSON.parse(localStorage.getItem('tindacheck-list')    || '[]');
+    // productData is the source of truth for how many cards exist and what's in them.
+    // Each entry is an object: { name, price, qty, unit } — or {} for a fresh empty card.
+    let productData       = [{}, {}];
+    let groceryList       = JSON.parse(localStorage.getItem('tindacheck-list')    || '[]');
     let comparisonHistory = JSON.parse(localStorage.getItem('tindacheck-history') || '[]');
 
 
@@ -1024,28 +1026,48 @@
     /* ============================================================
        RENDER PRODUCT INPUT CARDS
     ============================================================ */
+
+    // Placeholder text per slot — falls back gracefully beyond 5
+    const PLACEHOLDERS = [
+      'e.g. Del Monte Tomato Sauce',
+      'e.g. UFC Banana Ketchup',
+      'e.g. Jufran Banana Sauce',
+      'e.g. Heinz Tomato Ketchup',
+      'e.g. Hunt\'s Tomato Sauce',
+    ];
+
     function renderProducts() {
       const container = document.getElementById('products-container');
       container.innerHTML = '';
 
-      const names        = ['Product 1', 'Product 2', 'Product 3'];
-      const placeholders = [
-        'e.g. Del Monte Tomato Sauce',
-        'e.g. UFC Banana Ketchup',
-        'e.g. Jufran Banana Sauce',
-      ];
+      productData.forEach((saved, i) => {
+        // Show × remove button only when there are more than 2 cards
+        const showRemove = productData.length > 2;
+        const removeBtn  = showRemove
+          ? `<button class="btn-remove-product" onclick="removeProduct(${i})"
+                     aria-label="Remove Item ${i + 1}">×</button>`
+          : '';
 
-      for (let i = 0; i < productCount; i++) {
+        // Restore previously typed values so they survive add/remove re-renders
+        const selOpts = ['g','kg','ml','L','piece'].map(u =>
+          `<option value="${u}" ${(saved.unit || 'g') === u ? 'selected' : ''}>
+            ${u === 'g' ? 'g — grams' : u === 'kg' ? 'kg — kilograms' :
+              u === 'ml' ? 'ml — millilitres' : u === 'L' ? 'L — litres' : 'piece — each'}
+           </option>`
+        ).join('');
+
         container.insertAdjacentHTML('beforeend', `
           <div class="product-card" id="card-${i}">
             <div class="product-card-header">
               <span class="product-badge">ITEM ${i + 1}</span>
-              <span class="product-card-title">${names[i]}</span>
+              <span class="product-card-title">Product ${i + 1}</span>
+              ${removeBtn}
             </div>
             <div class="field-group">
               <label class="field-label" for="name-${i}">Product Name</label>
               <input class="field-input" type="text" id="name-${i}"
-                     placeholder="${placeholders[i]}"
+                     placeholder="${PLACEHOLDERS[i] || 'Product name'}"
+                     value="${escapeHTML(saved.name || '')}"
                      autocomplete="off" autocorrect="off" spellcheck="false" />
             </div>
             <div class="field-row">
@@ -1053,40 +1075,67 @@
                 <label class="field-label" for="price-${i}">Price (₱)</label>
                 <input class="field-input" type="number" id="price-${i}"
                        placeholder="0.00" min="0.01" step="0.01"
-                       inputmode="decimal" />
+                       inputmode="decimal" value="${saved.price || ''}" />
               </div>
               <div class="field-group">
                 <label class="field-label" for="qty-${i}">Quantity</label>
                 <input class="field-input" type="number" id="qty-${i}"
                        placeholder="0" min="0.01" step="any"
-                       inputmode="decimal" />
+                       inputmode="decimal" value="${saved.qty || ''}" />
               </div>
             </div>
             <div class="field-group">
               <label class="field-label" for="unit-${i}">Unit</label>
-              <select class="field-select" id="unit-${i}">
-                <option value="g">g — grams</option>
-                <option value="kg">kg — kilograms</option>
-                <option value="ml">ml — millilitres</option>
-                <option value="L">L — litres</option>
-                <option value="piece">piece — each</option>
-              </select>
+              <select class="field-select" id="unit-${i}">${selOpts}</select>
             </div>
           </div>
         `);
-      }
+      });
+
+      // Hide "+ Add Another Item" when we've hit the 5-item cap
+      const addBtn = document.getElementById('btn-add-product');
+      if (addBtn) addBtn.classList.toggle('hidden', productData.length >= 5);
     }
 
 
     /* ============================================================
-       TOGGLE BETWEEN 2 AND 3 PRODUCTS
+       ADD / REMOVE PRODUCTS
     ============================================================ */
-    function setProductCount(n) {
-      productCount = n;
-      document.getElementById('btn2').classList.toggle('active', n === 2);
-      document.getElementById('btn3').classList.toggle('active', n === 3);
-      document.getElementById('btn2').setAttribute('aria-pressed', n === 2);
-      document.getElementById('btn3').setAttribute('aria-pressed', n === 3);
+
+    /** Snapshots whatever the user has typed into productData so it survives re-renders */
+    function saveCurrentValues() {
+      productData.forEach((_, i) => {
+        const nameEl  = document.getElementById(`name-${i}`);
+        if (!nameEl) return;
+        productData[i] = {
+          name:  nameEl.value,
+          price: document.getElementById(`price-${i}`).value,
+          qty:   document.getElementById(`qty-${i}`).value,
+          unit:  document.getElementById(`unit-${i}`).value,
+        };
+      });
+    }
+
+    /** Appends a new empty product card. Capped at 5. */
+    function addProduct() {
+      if (productData.length >= 5) return;
+      saveCurrentValues();
+      productData.push({});
+      hideResults();
+      hideError();
+      renderProducts();
+      // Scroll the new card into view
+      setTimeout(() => {
+        const newCard = document.getElementById(`card-${productData.length - 1}`);
+        if (newCard) newCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 80);
+    }
+
+    /** Removes the card at index i. Minimum 2 cards always remain. */
+    function removeProduct(i) {
+      if (productData.length <= 2) return;
+      saveCurrentValues();
+      productData.splice(i, 1);
       hideResults();
       hideError();
       renderProducts();
@@ -1100,9 +1149,12 @@
       hideError();
       hideResults();
 
+      // Snapshot typed values into productData before we read them
+      saveCurrentValues();
+
       const products = [];
 
-      for (let i = 0; i < productCount; i++) {
+      for (let i = 0; i < productData.length; i++) {
         const nameRaw = document.getElementById(`name-${i}`).value.trim();
         const name    = nameRaw || `Product ${i + 1}`;
         const price   = parseFloat(document.getElementById(`price-${i}`).value);
@@ -1210,6 +1262,7 @@
        RESET
     ============================================================ */
     function resetApp() {
+      productData = [{}, {}];   // back to 2 empty cards
       hideResults();
       hideError();
       renderProducts();
