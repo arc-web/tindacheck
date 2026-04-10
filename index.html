@@ -777,6 +777,188 @@
       to   { opacity: 1; transform: translateY(0); }
     }
 
+    /* ============================================================
+       BARCODE SCANNER
+    ============================================================ */
+
+    .name-field-wrapper {
+      display: flex;
+      gap: 8px;
+      align-items: stretch;
+    }
+
+    .name-field-wrapper .field-input {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .btn-scan {
+      width: 52px;
+      height: 52px;
+      flex-shrink: 0;
+      background: var(--green-dark);
+      color: var(--orange-light);
+      border: 1px solid var(--orange);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .btn-scan:active { background: var(--green-mid); }
+
+    .scanner-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: flex-end;
+    }
+
+    .scanner-modal.hidden { display: none !important; }
+
+    .scanner-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 15, 26, 0.80);
+    }
+
+    .scanner-sheet {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 480px;
+      margin: 0 auto;
+      background: var(--green-dark);
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+      border-top: 1px solid var(--orange);
+      padding: 0 0 32px;
+      overflow: hidden;
+    }
+
+    .scanner-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 20px 14px;
+      border-bottom: 1px solid rgba(201, 168, 76, 0.2);
+    }
+
+    .scanner-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--orange-light);
+      letter-spacing: 0.3px;
+    }
+
+    .scanner-close-btn {
+      width: 32px;
+      height: 32px;
+      background: transparent;
+      color: var(--gray-400);
+      border: 1px solid var(--gray-600);
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    #scanner-viewport {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      background: #000;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #scanner-viewport video {
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: cover !important;
+    }
+
+    .scanner-status {
+      text-align: center;
+      padding: 14px 20px 4px;
+      font-size: 14px;
+      color: var(--gray-400);
+      min-height: 44px;
+    }
+
+    .scanner-loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 10px 20px;
+      font-size: 14px;
+      color: var(--orange-light);
+    }
+
+    .scanner-loading.hidden { display: none !important; }
+
+    .scanner-spinner {
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(201, 168, 76, 0.3);
+      border-top-color: var(--orange);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      flex-shrink: 0;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .scanner-cancel-btn {
+      display: block;
+      width: calc(100% - 40px);
+      margin: 12px 20px 0;
+      height: 52px;
+      background: transparent;
+      color: var(--gray-400);
+      border: 1px solid var(--gray-600);
+      border-radius: var(--radius-sm);
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: border-color 0.15s, color 0.15s;
+    }
+
+    .scanner-cancel-btn:active {
+      border-color: var(--orange);
+      color: var(--orange-light);
+    }
+
+    .scan-toast {
+      position: fixed;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--green-mid);
+      color: var(--orange-light);
+      border: 1px solid var(--orange);
+      border-radius: var(--radius-sm);
+      padding: 10px 20px;
+      font-size: 14px;
+      font-weight: 600;
+      white-space: nowrap;
+      z-index: 2000;
+      animation: toastIn 0.25s ease forwards;
+      pointer-events: none;
+    }
+
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+      to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+
   </style>
 </head>
 <body>
@@ -1068,10 +1250,21 @@
             <!-- 1. Product name -->
             <div class="field-group">
               <label class="field-label" for="name-${i}">Product Name</label>
-              <input class="field-input" type="text" id="name-${i}"
-                     placeholder="${PLACEHOLDERS[i] || 'Product name'}"
-                     value="${escapeHTML(saved.name || '')}"
-                     autocomplete="off" autocorrect="off" spellcheck="false" />
+              <div class="name-field-wrapper">
+                <input class="field-input" type="text" id="name-${i}"
+                       placeholder="${PLACEHOLDERS[i] || 'Product name'}"
+                       value="${escapeHTML(saved.name || '')}"
+                       autocomplete="off" autocorrect="off" spellcheck="false" />
+                <button class="btn-scan" onclick="openScanner(${i})" aria-label="Scan barcode for Item ${i + 1}" title="Scan barcode">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/>
+                    <path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/>
+                    <line x1="7" y1="8" x2="7" y2="16"/><line x1="11" y1="8" x2="11" y2="16"/>
+                    <line x1="15" y1="8" x2="15" y2="16"/><line x1="19" y1="8" x2="19" y2="16"/>
+                    <line x1="3" y1="12" x2="21" y2="12"/>
+                  </svg>
+                </button>
+              </div>
             </div>
 
             <!-- 2. Size + Unit side by side -->
@@ -1369,10 +1562,248 @@
 
 
     /* ============================================================
+       BARCODE SCANNER
+    ============================================================ */
+
+    let activeScannerIndex = -1;
+    let html5QrScanner     = null;
+
+    function openScanner(index) {
+      if (typeof Html5Qrcode === 'undefined') {
+        showScanToast('Camera scanning not available on this browser.');
+        return;
+      }
+      activeScannerIndex = index;
+      document.getElementById('scanner-status').textContent = 'Point the camera at a barcode';
+      document.getElementById('scanner-loading').classList.add('hidden');
+      document.getElementById('scanner-modal').classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+      startScanner();
+    }
+
+    async function startScanner() {
+      await destroyScanner();
+      try {
+        html5QrScanner = new Html5Qrcode('scanner-viewport');
+        const config = {
+          fps: 10,
+          qrbox: { width: 260, height: 120 },
+          formatsToSupport: [
+            Html5QrcodeSupportedFormats.EAN_13,
+            Html5QrcodeSupportedFormats.EAN_8,
+            Html5QrcodeSupportedFormats.UPC_A,
+            Html5QrcodeSupportedFormats.UPC_E,
+          ],
+          aspectRatio: 1.0,
+        };
+        await html5QrScanner.start(
+          { facingMode: 'environment' },
+          config,
+          onBarcodeDetected,
+          null
+        );
+      } catch (err) {
+        const msg = err && err.message ? err.message.toLowerCase() : '';
+        document.getElementById('scanner-status').textContent =
+          msg.includes('permission')
+            ? '⚠️ Camera permission denied. Please allow camera access and try again.'
+            : '⚠️ Could not start camera. Enter the product name manually.';
+      }
+    }
+
+    async function destroyScanner() {
+      if (!html5QrScanner) return;
+      try {
+        const state = html5QrScanner.getState();
+        if (state === 2 || state === 3) await html5QrScanner.stop();
+      } catch (_) {}
+      try { html5QrScanner.clear(); } catch (_) {}
+      html5QrScanner = null;
+    }
+
+    async function closeScanner() {
+      await destroyScanner();
+      document.getElementById('scanner-modal').classList.add('hidden');
+      document.body.style.overflow = '';
+      activeScannerIndex = -1;
+    }
+
+    async function onBarcodeDetected(barcode) {
+      await destroyScanner();
+      document.getElementById('scanner-status').textContent = 'Found: ' + barcode;
+      document.getElementById('scanner-loading').classList.remove('hidden');
+      await lookupBarcode(barcode);
+    }
+
+    async function lookupBarcode(barcode) {
+      const loadingEl = document.getElementById('scanner-loading');
+      const statusEl  = document.getElementById('scanner-status');
+      try {
+        const url = 'https://world.openfoodfacts.org/api/v0/product/' + encodeURIComponent(barcode) + '.json';
+        const response = await fetch(url, { signal: AbortSignal.timeout(8000) });
+        if (!response.ok) throw new Error('HTTP ' + response.status);
+        const data = await response.json();
+
+        loadingEl.classList.add('hidden');
+
+        if (data.status !== 1 || !data.product) {
+          populateFromScan(activeScannerIndex, barcode, null);
+          await closeScanner();
+          showScanToast('Product not found — barcode added as name.');
+          return;
+        }
+
+        populateFromScan(activeScannerIndex, null, data.product);
+        await closeScanner();
+        showScanToast('Product details filled in!');
+
+      } catch (err) {
+        loadingEl.classList.add('hidden');
+        const isOffline = !navigator.onLine || (err && err.name === 'TypeError');
+        statusEl.textContent = isOffline
+          ? '⚠️ No internet. Barcode added as name.'
+          : '⚠️ Lookup failed. Barcode added as name.';
+        populateFromScan(activeScannerIndex, barcode, null);
+        await new Promise(r => setTimeout(r, 1800));
+        await closeScanner();
+        showScanToast('Could not look up product — barcode added as name.');
+      }
+    }
+
+    function normaliseUnit(raw) {
+      const r = (raw || '').toLowerCase();
+      if (r === 'g')                                    return 'g';
+      if (r === 'kg')                                   return 'kg';
+      if (r === 'ml')                                   return 'ml';
+      if (r === 'l')                                    return 'L';
+      if (r === 'cl')                                   return 'ml';
+      if (['piece','pcs','pc','each'].includes(r))      return 'piece';
+      return null;
+    }
+
+    function parseQuantity(quantityStr) {
+      if (!quantityStr || typeof quantityStr !== 'string') return null;
+      let s = quantityStr.trim()
+        .replace(/,/g, '.')
+        .replace(/^e\s+/i, '')
+        .replace(/\s+/g, ' ');
+
+      // Multi-pack: "6 x 50g", "12 x 330ml"
+      const multi = s.match(/^(\d+(?:\.\d+)?)\s*[x×*]\s*(\d+(?:\.\d+)?)\s*(g|kg|ml|l|cl|piece|pcs|pc|each)s?/i);
+      if (multi) {
+        const total = parseFloat(multi[1]) * parseFloat(multi[2]);
+        let unit = normaliseUnit(multi[3]);
+        if (!unit) return null;
+        let qty = total;
+        if (multi[3].toLowerCase() === 'cl') { qty = total * 10; unit = 'ml'; }
+        return { qty, unit };
+      }
+
+      // Single: "200g", "1.5 L", "500ml"
+      const single = s.match(/^(\d+(?:\.\d+)?)\s*(g|kg|ml|l|cl|piece|pcs|pc|each)s?/i);
+      if (single) {
+        let qty = parseFloat(single[1]);
+        const raw = single[2];
+        let unit = normaliseUnit(raw);
+        if (!unit) return null;
+        if (raw.toLowerCase() === 'cl') { qty = qty * 10; unit = 'ml'; }
+        return { qty, unit };
+      }
+
+      // Bare number → piece
+      const bare = s.match(/^(\d+(?:\.\d+)?)$/);
+      if (bare) return { qty: parseFloat(bare[1]), unit: 'piece' };
+
+      return null;
+    }
+
+    function populateFromScan(index, fallbackBarcode, product) {
+      const nameEl  = document.getElementById('name-'  + index);
+      const qtyEl   = document.getElementById('qty-'   + index);
+      const unitEl  = document.getElementById('unit-'  + index);
+      if (!nameEl) return;
+
+      if (!product) {
+        nameEl.value = fallbackBarcode || '';
+        productData[index] = { ...productData[index], name: nameEl.value };
+        return;
+      }
+
+      const name = (
+        product.product_name_en ||
+        product.product_name    ||
+        product.abbreviated_product_name || ''
+      ).trim();
+      nameEl.value = name;
+
+      const rawQty = product.quantity || product.net_weight || product.net_volume || '';
+      const parsed = parseQuantity(rawQty);
+      if (parsed && qtyEl && unitEl) {
+        qtyEl.value  = parsed.qty;
+        unitEl.value = parsed.unit;
+      }
+
+      productData[index] = {
+        ...productData[index],
+        name: nameEl.value,
+        qty:  qtyEl  ? qtyEl.value  : productData[index].qty,
+        unit: unitEl ? unitEl.value : productData[index].unit,
+      };
+
+      // Focus price field so user just types the price
+      const priceEl = document.getElementById('price-' + index);
+      if (priceEl) {
+        setTimeout(() => {
+          priceEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          priceEl.focus();
+        }, 350);
+      }
+    }
+
+    function showScanToast(message) {
+      const old = document.querySelector('.scan-toast');
+      if (old) old.remove();
+      const toast = document.createElement('div');
+      toast.className = 'scan-toast';
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      setTimeout(() => {
+        toast.style.transition = 'opacity 0.3s';
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 300);
+      }, 2500);
+    }
+
+
+    /* ============================================================
        INITIALISE
     ============================================================ */
     renderProducts();
 
   </script>
+
+  <!-- html5-qrcode library for barcode scanning -->
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+
+  <!-- =====================================================
+       BARCODE SCANNER MODAL
+  ====================================================== -->
+  <div id="scanner-modal" class="scanner-modal hidden" role="dialog" aria-modal="true" aria-label="Barcode Scanner">
+    <div class="scanner-backdrop" onclick="closeScanner()"></div>
+    <div class="scanner-sheet">
+      <div class="scanner-header">
+        <span class="scanner-title">Scan Barcode</span>
+        <button class="scanner-close-btn" onclick="closeScanner()" aria-label="Close scanner">✕</button>
+      </div>
+      <div id="scanner-viewport"></div>
+      <div id="scanner-status" class="scanner-status">Point the camera at a barcode</div>
+      <div id="scanner-loading" class="scanner-loading hidden">
+        <div class="scanner-spinner"></div>
+        <span>Looking up product…</span>
+      </div>
+      <button class="scanner-cancel-btn" onclick="closeScanner()">Cancel</button>
+    </div>
+  </div>
+
 </body>
 </html>
