@@ -553,8 +553,13 @@
     ============================================================ */
     .list-section { padding-top: 20px; }
 
-    .list-add-row { display: flex; gap: 10px; margin-bottom: 20px; }
+    .list-add-form { margin-bottom: 20px; }
+    .list-add-row { display: flex; gap: 10px; margin-bottom: 8px; }
     .list-add-row .field-input { flex: 1; }
+    .list-add-meta { display: flex; gap: 8px; align-items: center; }
+    .list-size-input { width: 100px; flex-shrink: 0; }
+    .list-unit-select { width: 90px; flex-shrink: 0; }
+    .list-meta-hint { font-size: 11px; color: var(--text-3); line-height: 1.4; flex: 1; }
 
     .btn-add {
       width: 48px; height: 48px;
@@ -610,8 +615,19 @@
       border: 2px solid var(--border-hi);
     }
 
-    .list-item-name {
+    .list-item-info {
       flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .list-item-meta {
+      font-size: 12px;
+      color: var(--text-3);
+      font-weight: 500;
+    }
+    .list-item-name {
       font-size: 15px;
       font-weight: 500;
       color: var(--text);
@@ -1064,12 +1080,26 @@
       <!-- MY LIST TAB -->
       <div id="tab-list" class="hidden" role="tabpanel">
         <div class="list-section">
-          <div class="list-add-row">
-            <input class="field-input" type="text" id="list-input"
-                   placeholder="Add an item..."
-                   autocomplete="off" autocorrect="off" spellcheck="false"
-                   onkeydown="if(event.key==='Enter') addListItem()" />
-            <button class="btn-add" onclick="addListItem()" aria-label="Add item">+</button>
+          <div class="list-add-form">
+            <div class="list-add-row">
+              <input class="field-input" type="text" id="list-input"
+                     placeholder="Item name (e.g. Tomato Sauce)"
+                     autocomplete="off" autocorrect="off" spellcheck="false"
+                     onkeydown="if(event.key==='Enter') addListItem()" />
+              <button class="btn-add" onclick="addListItem()" aria-label="Add item">+</button>
+            </div>
+            <div class="list-add-meta">
+              <input class="field-input list-size-input" type="number" id="list-size-input"
+                     placeholder="Size (e.g. 500)" min="0.01" step="any" inputmode="decimal" />
+              <select class="field-select list-unit-select" id="list-unit-select">
+                <option value="ml">ml</option>
+                <option value="L">L</option>
+                <option value="g">g</option>
+                <option value="kg">kg</option>
+                <option value="piece">piece</option>
+              </select>
+              <span class="list-meta-hint">Optional — pre-fill size &amp; unit for faster comparison</span>
+            </div>
           </div>
           <div id="list-count" class="list-count hidden"></div>
           <div id="list-container"></div>
@@ -1123,10 +1153,14 @@
        STATE
     ============================================================ */
     let productData       = [{}, {}];
-    let groceryList       = JSON.parse(localStorage.getItem('tindacheck-list')    || '[]');
     let comparisonHistory = JSON.parse(localStorage.getItem('tindacheck-history') || '[]');
     let shoppingCart      = JSON.parse(localStorage.getItem('tindacheck-cart')    || '[]');
     let currentProducts   = {}; // keyed by originalIndex, populated in compare()
+
+    // groceryList stores objects: { name, size, unit }
+    // Migrate old string-array format to object format automatically
+    let groceryList = (JSON.parse(localStorage.getItem('tindacheck-list') || '[]'))
+      .map(item => typeof item === 'string' ? { name: item, size: '', unit: 'ml' } : item);
 
 
     /* ============================================================
@@ -1175,14 +1209,19 @@
     }
 
     function addListItem() {
-      const input = document.getElementById('list-input');
-      const name  = input.value.trim();
-      if (!name) { input.focus(); return; }
-      groceryList.push(name);
+      const nameInput = document.getElementById('list-input');
+      const sizeInput = document.getElementById('list-size-input');
+      const unitInput = document.getElementById('list-unit-select');
+      const name = nameInput.value.trim();
+      if (!name) { nameInput.focus(); return; }
+      const size = sizeInput ? sizeInput.value.trim() : '';
+      const unit = unitInput ? unitInput.value : 'ml';
+      groceryList.push({ name, size, unit });
       saveList();
       renderList();
-      input.value = '';
-      input.focus();
+      nameInput.value = '';
+      if (sizeInput) sizeInput.value = '';
+      nameInput.focus();
     }
 
     function removeListItem(idx) {
@@ -1191,18 +1230,23 @@
       renderList();
     }
 
-    function compareItem(name) {
-      productData = [{ name }, {}];
+    function compareItem(idx) {
+      const item = groceryList[idx];
+      if (!item) return;
+      // Pre-fill ALL slots with the same size + unit so comparison is purely by price
+      productData = [
+        { name: item.name, size: item.size || '', unit: item.unit || 'ml' },
+        { name: '',        size: item.size || '', unit: item.unit || 'ml' },
+      ];
       hideResults();
       hideError();
       switchTab('compare');
       renderProducts();
       setTimeout(() => {
-        const sizeInput = document.getElementById('size-0');
-        if (sizeInput) {
-          sizeInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          sizeInput.focus();
-        }
+        // If size is already set, jump straight to the name of slot 1 (next product to fill)
+        const focusId = item.size ? 'name-1' : 'size-0';
+        const el = document.getElementById(focusId);
+        if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.focus(); }
       }, 80);
     }
 
@@ -1222,15 +1266,19 @@
       countEl.classList.remove('hidden');
       countEl.textContent = `${groceryList.length} item${groceryList.length !== 1 ? 's' : ''}`;
 
-      groceryList.forEach((name, idx) => {
+      groceryList.forEach((item, idx) => {
+        const name = item.name || item; // backward compat
+        const sizeLabel = item.size ? `<span class="list-item-meta">${item.size}${item.unit}</span>` : '';
         const inCart = shoppingCart.some(c => c.name.toLowerCase().trim() === name.toLowerCase().trim());
-        const cartBadge = inCart ? `<span class="list-item-incart">🛒 In Cart</span>` : '';
+        const cartBadge = inCart ? `<span class="list-item-incart">🛒</span>` : '';
         container.insertAdjacentHTML('beforeend', `
           <div class="list-item" style="animation-delay:${idx * 0.04}s">
-            <div class="list-item-name">${escapeHTML(name)}</div>
+            <div class="list-item-info">
+              <div class="list-item-name">${escapeHTML(name)}</div>
+              ${sizeLabel}
+            </div>
             ${cartBadge}
-            <button class="btn-list-compare"
-                    onclick="compareItem(${JSON.stringify(name)})">Compare</button>
+            <button class="btn-list-compare" onclick="compareItem(${idx})">Price Check</button>
             <button class="btn-list-remove" onclick="removeListItem(${idx})"
                     aria-label="Remove ${escapeHTML(name)}">×</button>
           </div>
