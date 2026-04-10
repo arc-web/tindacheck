@@ -1010,8 +1010,9 @@
       return quantity;
     }
 
-    function pricePerUnit(price, quantity, unit) {
-      const base   = toBase(quantity, unit);
+    // price ÷ (toBase(size, unit) × packs), normalised to per-100 for weight/volume
+    function pricePerUnit(price, size, unit, packs) {
+      const base   = toBase(size, unit) * packs;
       const family = unitFamily(unit);
       return family === 'piece' ? price / base : (price / base) * 100;
     }
@@ -1049,8 +1050,8 @@
           : '';
 
         // Restore previously typed values so they survive add/remove re-renders
-        const selOpts = ['g','kg','ml','L','piece'].map(u =>
-          `<option value="${u}" ${(saved.unit || 'g') === u ? 'selected' : ''}>
+        const selOpts = ['ml','L','g','kg','piece'].map(u =>
+          `<option value="${u}" ${(saved.unit || 'ml') === u ? 'selected' : ''}>
             ${u === 'g' ? 'g — grams' : u === 'kg' ? 'kg — kilograms' :
               u === 'ml' ? 'ml — millilitres' : u === 'L' ? 'L — litres' : 'piece — each'}
            </option>`
@@ -1063,6 +1064,8 @@
               <span class="product-card-title">Product ${i + 1}</span>
               ${removeBtn}
             </div>
+
+            <!-- 1. Product name -->
             <div class="field-group">
               <label class="field-label" for="name-${i}">Product Name</label>
               <input class="field-input" type="text" id="name-${i}"
@@ -1070,24 +1073,37 @@
                      value="${escapeHTML(saved.name || '')}"
                      autocomplete="off" autocorrect="off" spellcheck="false" />
             </div>
+
+            <!-- 2. Size + Unit side by side -->
             <div class="field-row">
               <div class="field-group">
-                <label class="field-label" for="price-${i}">Price (₱)</label>
-                <input class="field-input" type="number" id="price-${i}"
-                       placeholder="0.00" min="0.01" step="0.01"
-                       inputmode="decimal" value="${saved.price || ''}" />
+                <label class="field-label" for="size-${i}">Size / Amount</label>
+                <input class="field-input" type="number" id="size-${i}"
+                       placeholder="e.g. 500" min="0.01" step="any"
+                       inputmode="decimal" value="${saved.size || ''}" />
               </div>
               <div class="field-group">
-                <label class="field-label" for="qty-${i}">Quantity</label>
-                <input class="field-input" type="number" id="qty-${i}"
-                       placeholder="0" min="0.01" step="any"
-                       inputmode="decimal" value="${saved.qty || ''}" />
+                <label class="field-label" for="unit-${i}">Unit</label>
+                <select class="field-select" id="unit-${i}">${selOpts}</select>
               </div>
             </div>
+
+            <!-- 3. Quantity (packs / bottles) -->
             <div class="field-group">
-              <label class="field-label" for="unit-${i}">Unit</label>
-              <select class="field-select" id="unit-${i}">${selOpts}</select>
+              <label class="field-label" for="packs-${i}">Quantity (packs / bottles)</label>
+              <input class="field-input" type="number" id="packs-${i}"
+                     value="${saved.packs || 1}" min="1" step="1"
+                     inputmode="numeric" />
             </div>
+
+            <!-- 4. Total price -->
+            <div class="field-group">
+              <label class="field-label" for="price-${i}">Total Price (₱)</label>
+              <input class="field-input" type="number" id="price-${i}"
+                     placeholder="0.00" min="0.01" step="0.01"
+                     inputmode="decimal" value="${saved.price || ''}" />
+            </div>
+
           </div>
         `);
       });
@@ -1109,9 +1125,10 @@
         if (!nameEl) return;
         productData[i] = {
           name:  nameEl.value,
-          price: document.getElementById(`price-${i}`).value,
-          qty:   document.getElementById(`qty-${i}`).value,
+          size:  document.getElementById(`size-${i}`).value,
           unit:  document.getElementById(`unit-${i}`).value,
+          packs: document.getElementById(`packs-${i}`).value,
+          price: document.getElementById(`price-${i}`).value,
         };
       });
     }
@@ -1157,24 +1174,25 @@
       for (let i = 0; i < productData.length; i++) {
         const nameRaw = document.getElementById(`name-${i}`).value.trim();
         const name    = nameRaw || `Product ${i + 1}`;
-        const price   = parseFloat(document.getElementById(`price-${i}`).value);
-        const qty     = parseFloat(document.getElementById(`qty-${i}`).value);
+        const size    = parseFloat(document.getElementById(`size-${i}`).value);
         const unit    = document.getElementById(`unit-${i}`).value;
+        const packs   = parseFloat(document.getElementById(`packs-${i}`).value) || 1;
+        const price   = parseFloat(document.getElementById(`price-${i}`).value);
 
+        if (isNaN(size) || size <= 0) {
+          showError(`⚠️ Please enter a valid size/amount for ${name}.`);
+          document.getElementById(`size-${i}`).focus();
+          return;
+        }
         if (isNaN(price) || price <= 0) {
           showError(`⚠️ Please enter a valid price for ${name}.`);
           document.getElementById(`price-${i}`).focus();
           return;
         }
-        if (isNaN(qty) || qty <= 0) {
-          showError(`⚠️ Please enter a valid quantity for ${name}.`);
-          document.getElementById(`qty-${i}`).focus();
-          return;
-        }
 
         const family  = unitFamily(unit);
-        const perUnit = pricePerUnit(price, qty, unit);
-        products.push({ name, price, qty, unit, family, perUnit });
+        const perUnit = pricePerUnit(price, size, unit, packs);
+        products.push({ name, price, size, packs, unit, family, perUnit });
       }
 
       const families   = [...new Set(products.map(p => p.family))];
@@ -1234,7 +1252,7 @@
               ${priceStr}<span class="result-unit-label">${label}</span>
             </div>
             <div class="result-original">
-              ₱${p.price.toFixed(2)} for ${p.qty}${p.unit}
+              ₱${p.price.toFixed(2)} · ${p.size}${p.unit} × ${p.packs} ${p.packs === 1 ? 'pack' : 'packs'}
             </div>
             ${savingsHTML}
           </div>
