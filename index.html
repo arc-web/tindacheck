@@ -1101,18 +1101,18 @@
     }
 
     function compareItem(name) {
+      productData = [{ name }, {}];
+      hideResults();
+      hideError();
       switchTab('compare');
+      renderProducts();
       setTimeout(() => {
-        const nameInput = document.getElementById('name-0');
-        if (nameInput) {
-          nameInput.value = name;
-          const priceInput = document.getElementById('price-0');
-          if (priceInput) {
-            priceInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            priceInput.focus();
-          }
+        const sizeInput = document.getElementById('size-0');
+        if (sizeInput) {
+          sizeInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          sizeInput.focus();
         }
-      }, 50);
+      }, 80);
     }
 
     function renderList() {
@@ -1136,7 +1136,7 @@
           <div class="list-item" style="animation-delay:${idx * 0.04}s">
             <div class="list-item-name">${escapeHTML(name)}</div>
             <button class="btn-list-compare"
-                    onclick="compareItem(${JSON.stringify(escapeHTML(name))})">Compare</button>
+                    onclick="compareItem(${JSON.stringify(name)})">Compare</button>
             <button class="btn-list-remove" onclick="removeListItem(${idx})"
                     aria-label="Remove ${escapeHTML(name)}">×</button>
           </div>
