@@ -437,6 +437,28 @@
 
     .btn-reset:active { background: var(--surface-3); color: var(--text-2); }
 
+    .btn-back-to-list {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      width: 100%;
+      height: 52px;
+      background: var(--best-soft);
+      color: var(--best);
+      border: 1.5px solid var(--best);
+      border-radius: 14px;
+      font-size: 15px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      margin-top: 16px;
+      transition: background 0.15s, color 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .btn-back-to-list:active { background: var(--best); color: #fff; }
+
     /* ============================================================
        ERROR
     ============================================================ */
@@ -568,6 +590,16 @@
       color: var(--text-2);
       line-height: 1.6;
     }
+
+    .savings-pct {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--worst);
+      letter-spacing: -0.3px;
+    }
+
+    .result-card.middle .savings-pct { color: var(--mid); }
+    .result-card.loser  .savings-pct { color: var(--worst); }
 
     .mixed-unit-notice {
       background: var(--warn-soft);
@@ -988,10 +1020,68 @@
     .cart-item-price { font-size: 16px; font-weight: 700; color: var(--text); white-space: nowrap; flex-shrink: 0; }
     .btn-cart-remove { font-size: 18px; color: var(--text-3); background: transparent; border: none; cursor: pointer; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; -webkit-tap-highlight-color: transparent; transition: color 0.15s; }
     .btn-cart-remove:active { color: var(--danger, #ef4444); }
+
+    .cart-qty-stepper {
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+      background: var(--surface-2);
+      border: 1px solid var(--border-hi);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .btn-qty {
+      width: 32px;
+      height: 32px;
+      background: transparent;
+      border: none;
+      color: var(--text-2);
+      font-size: 17px;
+      font-weight: 500;
+      line-height: 1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      -webkit-tap-highlight-color: transparent;
+      transition: background 0.12s, color 0.12s;
+      flex-shrink: 0;
+    }
+
+    .btn-qty:active { background: var(--surface-3); color: var(--text); }
+    .btn-qty:disabled { color: var(--text-3); cursor: default; }
+
+    .cart-qty-num {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      min-width: 26px;
+      text-align: center;
+      padding: 0 2px;
+      user-select: none;
+    }
     .cart-total-bar { display: flex; align-items: center; justify-content: space-between; padding: 18px 20px; background: var(--surface-2); border: 1px solid var(--border-hi); border-radius: 14px; margin-top: 16px; box-shadow: var(--shadow-sm); }
     .cart-total-label { font-size: 13px; font-weight: 600; color: var(--text-2); text-transform: uppercase; letter-spacing: 0.8px; }
     .cart-total-amount { font-size: 24px; font-weight: 700; color: var(--best); letter-spacing: -0.5px; }
-    .list-item-incart { font-size: 12px; color: var(--best); font-weight: 600; flex-shrink: 0; }
+    .list-item-incart {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--best);
+      background: var(--best-soft);
+      border: 1px solid rgba(52,211,153,0.25);
+      border-radius: 20px;
+      padding: 3px 9px;
+      flex-shrink: 0;
+      letter-spacing: 0.3px;
+      white-space: nowrap;
+    }
+    [data-theme="light"] .list-item-incart {
+      border-color: rgba(5,150,105,0.2);
+    }
 
     /* Add to Cart button on result cards */
     .btn-add-to-cart { display: block; width: 100%; height: 44px; margin-top: 12px; background: transparent; color: var(--text-2); border: 1px solid var(--border-hi); border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.15s, color 0.15s; -webkit-tap-highlight-color: transparent; }
@@ -1235,6 +1325,7 @@
         <section id="results-section" class="results-section hidden" aria-live="polite">
           <div class="results-heading">Results</div>
           <div id="results-container"></div>
+          <button class="btn-back-to-list" onclick="switchTab('list')">← Back to My List</button>
           <button class="btn-reset" onclick="resetApp()">↩ New Comparison</button>
         </section>
       </div>
@@ -1454,7 +1545,7 @@
         const name = item.name || item; // backward compat
         const sizeLabel = item.size ? `<span class="list-item-meta">${item.size}${item.unit}</span>` : '';
         const inCart = shoppingCart.some(c => c.name.toLowerCase().trim() === name.toLowerCase().trim());
-        const cartBadge = inCart ? `<span class="list-item-incart">🛒</span>` : '';
+        const cartBadge = inCart ? `<span class="list-item-incart">✓ In Cart</span>` : '';
         container.insertAdjacentHTML('beforeend', `
           <div class="list-item" style="animation-delay:${idx * 0.04}s">
             <div class="list-item-info">
@@ -1772,11 +1863,14 @@
 
         let savingsHTML = '';
         if (!isWinner && winnerIdx !== -1 && !mixedUnits) {
-          const winner = products[winnerIdx];
-          const diff   = p.perUnit - winner.perUnit;
-          savingsHTML  = `
+          const winner  = products[winnerIdx];
+          const diff    = p.perUnit - winner.perUnit;
+          const pct     = Math.round((diff / p.perUnit) * 100);
+          savingsHTML   = `
             <div class="result-savings">
-              ${escapeHTML(winner.name)} is ₱${diff.toFixed(2)} ${label} cheaper
+              ${escapeHTML(winner.name)} is
+              <span class="savings-pct">${pct}% cheaper</span>
+              &mdash; saves you ₱${diff.toFixed(2)} ${label}
             </div>`;
         }
 
@@ -2010,13 +2104,23 @@
       if (shoppingCart.some(c => c.name.toLowerCase().trim() === p.name.toLowerCase().trim())) return;
       shoppingCart.push({
         name: p.name, price: p.price, size: p.size, unit: p.unit,
-        packs: p.packs, perUnit: p.perUnit, family: p.family, addedAt: Date.now()
+        packs: p.packs, perUnit: p.perUnit, family: p.family, addedAt: Date.now(), qty: 1
       });
       saveCart();
     }
 
     function removeFromCart(idx) {
       shoppingCart.splice(idx, 1);
+      saveCart();
+      renderCart();
+    }
+
+    function updateCartQty(idx, delta) {
+      const item = shoppingCart[idx];
+      if (!item) return;
+      const newQty = (item.qty || 1) + delta;
+      if (newQty < 1) return;
+      item.qty = newQty;
       saveCart();
       renderCart();
     }
@@ -2059,7 +2163,9 @@
       countEl.textContent = `${shoppingCart.length} item${shoppingCart.length > 1 ? 's' : ''}`;
       let total = 0;
       shoppingCart.forEach((item, idx) => {
-        total += item.price;
+        const qty   = item.qty || 1;
+        const lineTotal = item.price * qty;
+        total += lineTotal;
         const label = item.family === 'weight' ? 'per 100g' : item.family === 'volume' ? 'per 100ml' : 'per piece';
         container.insertAdjacentHTML('beforeend', `
           <div class="cart-item">
@@ -2067,7 +2173,13 @@
               <div class="cart-item-name">${escapeHTML(item.name || 'Unnamed product')}</div>
               <div class="cart-item-detail">${item.size}${item.unit} × ${item.packs} pack${item.packs > 1 ? 's' : ''} · ₱${item.perUnit.toFixed(2)} ${label}</div>
             </div>
-            <div class="cart-item-price">₱${item.price.toFixed(2)}</div>
+            <div class="cart-qty-stepper">
+              <button class="btn-qty" onclick="updateCartQty(${idx}, -1)"
+                      ${qty <= 1 ? 'disabled' : ''} aria-label="Decrease quantity">−</button>
+              <span class="cart-qty-num">${qty}</span>
+              <button class="btn-qty" onclick="updateCartQty(${idx}, 1)" aria-label="Increase quantity">+</button>
+            </div>
+            <div class="cart-item-price">₱${lineTotal.toFixed(2)}</div>
             <button class="btn-cart-remove" onclick="removeFromCart(${idx})" aria-label="Remove">×</button>
           </div>`);
       });
