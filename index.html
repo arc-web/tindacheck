@@ -20,12 +20,12 @@
        DESIGN TOKENS
     ============================================================ */
     :root {
-      --paper:          #fefce8;   /* legal-pad yellow-cream          */
-      --paper-alt:      #fff9d6;   /* slightly richer cream            */
-      --line-color:     #b8d4e8;   /* college-rule blue                */
-      --margin-color:   rgba(205, 72, 72, 0.38); /* red margin line   */
-      --margin-x:       54px;      /* distance of margin from left     */
-      --line-gap:       32px;      /* vertical distance between lines  */
+      --paper:          #fefce8;
+      --paper-alt:      #fff9d6;
+      --line-color:     #b8d4e8;
+      --margin-color:   rgba(205, 72, 72, 0.38);
+      --margin-x:       54px;
+      --line-gap:       32px;
 
       --ink:            #1a190e;
       --ink-mid:        #3b3924;
@@ -52,20 +52,15 @@
     /* ============================================================
        BASE
     ============================================================ */
-    html {
-      font-size: 16px;
-      -webkit-text-size-adjust: 100%;
-      height: 100%;
-    }
+    html { font-size: 16px; -webkit-text-size-adjust: 100%; height: 100%; }
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
       min-height: 100%;
-      /* Cork-board body */
       background-color: var(--board);
       background-image:
         radial-gradient(ellipse at 30% 20%, rgba(255,255,255,0.07) 0%, transparent 55%),
-        radial-gradient(ellipse at 75% 80%, rgba(0,0,0,0.08)       0%, transparent 50%),
+        radial-gradient(ellipse at 75% 80%, rgba(0,0,0,0.08) 0%, transparent 50%),
         url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.12'/%3E%3C/svg%3E");
       display: flex;
       justify-content: center;
@@ -73,7 +68,7 @@
     }
 
     /* ============================================================
-       NOTEPAD WRAPPER  (the physical pad on the cork board)
+       NOTEPAD WRAPPER
     ============================================================ */
     .notepad {
       width: 100%;
@@ -84,7 +79,7 @@
     }
 
     /* ============================================================
-       SPIRAL BINDING  (top strip with holes)
+       SPIRAL BINDING
     ============================================================ */
     .notepad-binding {
       background: var(--binding);
@@ -106,13 +101,12 @@
     }
 
     /* ============================================================
-       PAPER PAGE  (lined background + red margin)
+       PAPER PAGE
     ============================================================ */
     .notepad-page {
       position: relative;
       flex: 1;
       background-color: var(--paper);
-      /* Ruled lines + red margin in one background declaration */
       background-image:
         linear-gradient(
           to right,
@@ -129,13 +123,10 @@
           var(--line-color) var(--line-gap)
         );
       background-size: 100% 100%, 100% var(--line-gap);
-      /* Offset lines so they start below the header */
-      background-position: 0 0, 0 0;
-      /* Subtle paper grain overlay via box-shadow trick */
       overflow: hidden;
     }
 
-    /* Paper grain noise overlay */
+    /* Paper grain overlay */
     .notepad-page::after {
       content: '';
       position: absolute;
@@ -143,14 +134,12 @@
       pointer-events: none;
       z-index: 0;
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
-      opacity: 1;
     }
 
-    /* All direct children of the page sit above the grain overlay */
     .notepad-page > * { position: relative; z-index: 1; }
 
     /* ============================================================
-       APP HEADER  (top of the paper)
+       APP HEADER
     ============================================================ */
     .app-header {
       padding: 28px 20px 18px var(--margin-x);
@@ -158,12 +147,7 @@
       margin-bottom: 2px;
     }
 
-    .header-logo {
-      font-size: 28px;
-      line-height: 1;
-      display: block;
-      margin-bottom: 2px;
-    }
+    .header-logo { font-size: 28px; line-height: 1; display: block; margin-bottom: 2px; }
 
     .header-title {
       font-family: 'Kalam', cursive;
@@ -183,12 +167,11 @@
     }
 
     /* ============================================================
-       TAB NAVIGATION  (folder-tab style)
+       TAB NAVIGATION
     ============================================================ */
     .tab-nav {
       display: flex;
       border-bottom: 2px solid var(--line-color);
-      margin: 0;
       padding: 0 0 0 var(--margin-x);
       gap: 4px;
       background: transparent;
@@ -201,14 +184,14 @@
       color: var(--ink-faded);
       background: transparent;
       border: none;
-      padding: 10px 18px 8px;
+      padding: 10px 16px 8px;
       cursor: pointer;
       position: relative;
-      letter-spacing: 0.2px;
       -webkit-tap-highlight-color: transparent;
       transition: color 0.18s;
       border-bottom: 3px solid transparent;
       margin-bottom: -2px;
+      white-space: nowrap;
     }
 
     .tab-btn.active {
@@ -217,84 +200,80 @@
     }
 
     /* ============================================================
-       CONTAINER  (inner padding area)
+       CONTAINER
     ============================================================ */
-    .container {
-      padding: 0 16px 32px;
-    }
+    .container { padding: 0 16px 32px; }
 
     /* ============================================================
-       PRODUCT COUNT TOGGLE
+       ADD / REMOVE PRODUCT BUTTONS
     ============================================================ */
-    .toggle-section {
+    .btn-remove-product {
+      margin-left: auto;
+      height: 28px;
+      padding: 0 8px;
+      background: transparent;
+      color: var(--ink-faded);
+      border: 1px dashed var(--line-color);
+      border-radius: var(--radius-sm);
+      font-family: 'Kalam', cursive;
+      font-size: 18px;
+      line-height: 1;
+      cursor: pointer;
+      flex-shrink: 0;
       display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 20px 0 4px var(--margin-x);
-    }
-
-    .toggle-label {
-      font-family: 'Kalam', cursive;
-      font-size: 14px;
-      font-weight: 400;
-      color: var(--ink-faded);
-    }
-
-    .toggle-group {
-      display: flex;
-      gap: 6px;
-    }
-
-    .toggle-btn {
-      border: 1.5px solid var(--line-color);
-      background: transparent;
-      padding: 5px 16px;
-      border-radius: 3px;
-      font-family: 'Kalam', cursive;
-      font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
-      color: var(--ink-faded);
-      transition: background 0.15s, color 0.15s, border-color 0.15s;
-      min-height: 36px;
+      justify-content: center;
+      transition: color 0.15s, border-color 0.15s;
       -webkit-tap-highlight-color: transparent;
     }
 
-    .toggle-btn.active {
-      background: var(--ink-blue);
-      color: var(--paper);
-      border-color: var(--ink-blue);
+    .btn-remove-product:active { color: var(--ink-red); border-color: var(--ink-red); }
+
+    .btn-add-product {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      width: calc(100% - var(--margin-x));
+      margin-left: var(--margin-x);
+      height: 44px;
+      margin-top: 14px;
+      background: transparent;
+      color: var(--ink-blue-light);
+      border: 1.5px dashed var(--line-color);
+      border-radius: var(--radius);
+      font-family: 'Kalam', cursive;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+      -webkit-tap-highlight-color: transparent;
     }
 
+    .btn-add-product:active { border-color: var(--ink-blue-light); color: var(--ink-blue); }
+
     /* ============================================================
-       PRODUCT INPUT CARDS  (white paper on top of lined pad)
+       PRODUCT INPUT CARDS
     ============================================================ */
     .product-card {
       background: var(--white);
       border-radius: var(--radius);
       padding: 16px 16px 12px;
-      margin-top: 14px;
+      margin-top: 16px;
       box-shadow: var(--shadow-lift);
-      /* Slight clockwise tilt for realism — alternates via nth-child */
       position: relative;
     }
 
-    .product-card:nth-child(even) {
-      transform: rotate(0.4deg);
-    }
-    .product-card:nth-child(odd) {
-      transform: rotate(-0.3deg);
-    }
+    .product-card:nth-child(even) { transform: rotate(0.4deg); }
+    .product-card:nth-child(odd)  { transform: rotate(-0.3deg); }
 
-    /* Tape strip at top of each card */
+    /* Tape strip */
     .product-card::before {
       content: '';
       position: absolute;
-      top: -9px;
-      left: 50%;
+      top: -9px; left: 50%;
       transform: translateX(-50%);
-      width: 52px;
-      height: 18px;
+      width: 52px; height: 18px;
       background: rgba(255, 243, 100, 0.70);
       border-radius: 2px;
       border: 1px solid rgba(200, 185, 80, 0.40);
@@ -326,11 +305,9 @@
     }
 
     /* ============================================================
-       FORM FIELDS  (underline-only style — like writing on a line)
+       FORM FIELDS
     ============================================================ */
-    .field-group {
-      margin-bottom: 10px;
-    }
+    .field-group { margin-bottom: 10px; }
 
     .field-label {
       display: block;
@@ -367,16 +344,9 @@
       border-bottom-width: 2px;
     }
 
-    .field-input::placeholder {
-      color: var(--line-color);
-      font-weight: 300;
-    }
+    .field-input::placeholder { color: var(--line-color); font-weight: 300; }
 
-    .field-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-    }
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 
     .field-select {
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7' viewBox='0 0 12 7'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23b8d4e8' stroke-width='1.8' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
@@ -393,8 +363,6 @@
     /* ============================================================
        ACTION BUTTONS
     ============================================================ */
-
-    /* Primary — Compare (rubber stamp look) */
     .btn-compare {
       display: block;
       width: calc(100% - var(--margin-x));
@@ -407,13 +375,11 @@
       font-family: 'Kalam', cursive;
       font-size: 18px;
       font-weight: 700;
-      letter-spacing: 0.5px;
       cursor: pointer;
       margin-top: 20px;
       box-shadow: 3px 4px 0px var(--ink-blue-mid), var(--shadow-lift);
       transition: transform 0.1s, box-shadow 0.1s;
       -webkit-tap-highlight-color: transparent;
-      position: relative;
     }
 
     .btn-compare:active {
@@ -421,7 +387,6 @@
       box-shadow: 1px 1px 0px var(--ink-blue-mid);
     }
 
-    /* Secondary — Reset */
     .btn-reset {
       display: block;
       width: calc(100% - var(--margin-x));
@@ -440,10 +405,7 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    .btn-reset:active {
-      border-color: var(--ink-faded);
-      color: var(--ink-mid);
-    }
+    .btn-reset:active { border-color: var(--ink-faded); color: var(--ink-mid); }
 
     /* ============================================================
        ERROR BANNER
@@ -455,7 +417,6 @@
       padding: 12px 14px;
       font-family: 'Kalam', cursive;
       font-size: 14px;
-      font-weight: 400;
       margin-top: 14px;
       line-height: 1.4;
     }
@@ -463,9 +424,7 @@
     /* ============================================================
        RESULTS SECTION
     ============================================================ */
-    .results-section {
-      margin-top: 24px;
-    }
+    .results-section { margin-top: 24px; }
 
     .results-heading {
       font-family: 'Kalam', cursive;
@@ -496,14 +455,14 @@
     .result-card:nth-child(1) { animation-delay: 0.00s; }
     .result-card:nth-child(2) { animation-delay: 0.07s; }
     .result-card:nth-child(3) { animation-delay: 0.14s; }
+    .result-card:nth-child(4) { animation-delay: 0.21s; }
+    .result-card:nth-child(5) { animation-delay: 0.28s; }
 
     .result-card.winner {
       background: var(--highlight-bg);
       border-left-color: var(--ink-blue);
-      box-shadow: var(--shadow-lift);
     }
 
-    /* Yellow highlighter swipe on winner */
     .result-card.winner::after {
       content: '';
       position: absolute;
@@ -541,7 +500,6 @@
       font-weight: 700;
       padding: 3px 10px;
       border-radius: 3px;
-      letter-spacing: 0.5px;
       white-space: nowrap;
       flex-shrink: 0;
       position: relative;
@@ -557,10 +515,6 @@
       margin-bottom: 4px;
       position: relative;
       z-index: 1;
-    }
-
-    .result-card.winner .result-per-unit {
-      color: var(--ink-blue);
     }
 
     .result-unit-label {
@@ -584,7 +538,6 @@
       border-top: 1px dashed var(--line-color);
       font-family: 'Kalam', cursive;
       font-size: 13px;
-      font-weight: 400;
       color: var(--ink-mid);
       line-height: 1.4;
     }
@@ -603,9 +556,7 @@
     /* ============================================================
        GROCERY LIST TAB
     ============================================================ */
-    .list-section {
-      padding-top: 18px;
-    }
+    .list-section { padding-top: 18px; }
 
     .list-add-row {
       display: flex;
@@ -614,13 +565,10 @@
       padding-left: var(--margin-x);
     }
 
-    .list-add-row .field-input {
-      flex: 1;
-    }
+    .list-add-row .field-input { flex: 1; }
 
     .btn-add {
-      width: 44px;
-      height: 44px;
+      width: 44px; height: 44px;
       background: var(--ink-blue);
       color: var(--paper);
       border: none;
@@ -638,22 +586,10 @@
       line-height: 1;
     }
 
-    .btn-add:active {
-      transform: translate(1px, 2px);
-      box-shadow: 1px 1px 0px var(--ink-blue-mid);
-    }
+    .btn-add:active { transform: translate(1px, 2px); box-shadow: 1px 1px 0px var(--ink-blue-mid); }
 
-    .list-empty {
-      text-align: center;
-      padding: 40px 20px;
-      color: var(--line-color);
-    }
-
-    .list-empty-icon {
-      font-size: 36px;
-      display: block;
-      margin-bottom: 10px;
-    }
+    .list-empty { text-align: center; padding: 40px 20px; }
+    .list-empty-icon { font-size: 36px; display: block; margin-bottom: 10px; }
 
     .list-empty-text {
       font-family: 'Kalam', cursive;
@@ -672,7 +608,6 @@
       letter-spacing: 0.4px;
     }
 
-    /* Each to-do row */
     .list-item {
       display: flex;
       align-items: center;
@@ -684,12 +619,10 @@
       animation: slideUp 0.22s ease forwards;
     }
 
-    /* Checkbox circle */
     .list-item::before {
       content: '';
       flex-shrink: 0;
-      width: 16px;
-      height: 16px;
+      width: 16px; height: 16px;
       border-radius: 50%;
       border: 1.5px solid var(--ink-blue-light);
       background: transparent;
@@ -722,22 +655,16 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    .btn-list-compare:active {
-      background: var(--ink-blue);
-      color: var(--paper);
-    }
+    .btn-list-compare:active { background: var(--ink-blue); color: var(--paper); }
 
     .btn-list-remove {
-      font-family: 'Kalam', cursive;
       font-size: 18px;
-      font-weight: 300;
       color: var(--line-color);
       background: transparent;
       border: none;
       cursor: pointer;
       flex-shrink: 0;
-      width: 28px;
-      height: 28px;
+      width: 28px; height: 28px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -745,18 +672,130 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    .btn-list-remove:active {
-      color: var(--ink-red);
+    .btn-list-remove:active { color: var(--ink-red); }
+
+    /* ============================================================
+       HISTORY TAB
+    ============================================================ */
+    .history-section { padding-top: 18px; }
+
+    .history-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-left: var(--margin-x);
+      margin-bottom: 14px;
+    }
+
+    .history-count {
+      font-family: 'Kalam', cursive;
+      font-size: 12px;
+      color: var(--ink-faded);
+      letter-spacing: 0.4px;
+    }
+
+    .btn-clear-history {
+      font-family: 'Kalam', cursive;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--ink-faded);
+      background: transparent;
+      border: 1.5px dashed var(--line-color);
+      border-radius: var(--radius-sm);
+      padding: 4px 12px;
+      cursor: pointer;
+      transition: color 0.15s, border-color 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .btn-clear-history:active { color: var(--ink-red); border-color: var(--ink-red); }
+
+    .history-empty { text-align: center; padding: 40px 20px; }
+    .history-empty-icon { font-size: 36px; display: block; margin-bottom: 10px; }
+
+    .history-empty-text {
+      font-family: 'Kalam', cursive;
+      font-size: 15px;
+      font-weight: 300;
+      color: var(--ink-faded);
+      line-height: 1.6;
+    }
+
+    .history-entry {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 14px 14px 12px;
+      margin-bottom: 12px;
+      box-shadow: var(--shadow-lift);
+      border-left: 3px solid var(--line-color);
+      opacity: 0;
+      animation: slideUp 0.28s ease forwards;
+      position: relative;
+    }
+
+    .history-entry:nth-child(even) { transform: rotate(0.3deg); }
+    .history-entry:nth-child(odd)  { transform: rotate(-0.2deg); }
+
+    .history-entry-meta {
+      font-family: 'Kalam', cursive;
+      font-size: 11px;
+      color: var(--ink-faded);
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--line-color);
+    }
+
+    .history-product-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 5px 0;
+      border-bottom: 1px dashed var(--line-color);
+      gap: 8px;
+    }
+
+    .history-product-row:last-child { border-bottom: none; padding-bottom: 0; }
+
+    .history-product-name {
+      font-family: 'Kalam', cursive;
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--ink);
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .history-product-price {
+      font-family: 'Kalam', cursive;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--ink-blue);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .history-winner-badge {
+      font-family: 'Kalam', cursive;
+      background: var(--ink-blue);
+      color: var(--paper);
+      font-size: 9px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 3px;
+      letter-spacing: 0.8px;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
 
     /* ============================================================
-       UTILITY
+       UTILITY & ANIMATIONS
     ============================================================ */
     .hidden { display: none !important; }
 
-    /* ============================================================
-       ANIMATIONS
-    ============================================================ */
     @keyframes slideUp {
       from { opacity: 0; transform: translateY(12px); }
       to   { opacity: 1; transform: translateY(0); }
@@ -782,55 +821,34 @@
 
     <div class="notepad-page">
 
-      <!-- =====================================================
-           APP HEADER
-      ====================================================== -->
+      <!-- APP HEADER -->
       <header class="app-header">
         <span class="header-logo">🛒</span>
         <div class="header-title">TindaCheck</div>
         <div class="header-subtitle">Find the best deal — instantly</div>
       </header>
 
-      <!-- =====================================================
-           TAB NAVIGATION
-      ====================================================== -->
+      <!-- TAB NAVIGATION -->
       <nav class="tab-nav" role="tablist">
         <button class="tab-btn active" id="tab-btn-compare"
-                onclick="switchTab('compare')" role="tab" aria-selected="true">
-          Compare
-        </button>
+                onclick="switchTab('compare')" role="tab" aria-selected="true">Compare</button>
         <button class="tab-btn" id="tab-btn-list"
-                onclick="switchTab('list')" role="tab" aria-selected="false">
-          My List
-        </button>
+                onclick="switchTab('list')" role="tab" aria-selected="false">My List</button>
+        <button class="tab-btn" id="tab-btn-history"
+                onclick="switchTab('history')" role="tab" aria-selected="false">History</button>
       </nav>
 
       <div class="container">
 
-        <!-- =====================================================
-             COMPARE TAB
-        ====================================================== -->
+        <!-- COMPARE TAB -->
         <div id="tab-compare" role="tabpanel">
+          <div id="products-container" style="padding-top: 16px;"></div>
 
-          <div class="toggle-section">
-            <span class="toggle-label">Compare</span>
-            <div class="toggle-group" role="group" aria-label="Number of products to compare">
-              <button class="toggle-btn active" id="btn2"
-                      onclick="setProductCount(2)" aria-pressed="true">
-                2 Items
-              </button>
-              <button class="toggle-btn" id="btn3"
-                      onclick="setProductCount(3)" aria-pressed="false">
-                3 Items
-              </button>
-            </div>
-          </div>
-
-          <div id="products-container"></div>
-
-          <button class="btn-compare" onclick="compare()">
-            ✏️ Compare Prices
+          <button class="btn-add-product" id="btn-add-product" onclick="addProduct()">
+            + Add Another Item
           </button>
+
+          <button class="btn-compare" onclick="compare()">✏️ Compare Prices</button>
 
           <div id="error-banner" class="error-banner hidden" role="alert"></div>
 
@@ -839,15 +857,11 @@
             <div id="results-container"></div>
             <button class="btn-reset" onclick="resetApp()">↩ New Comparison</button>
           </section>
+        </div>
 
-        </div><!-- /tab-compare -->
-
-        <!-- =====================================================
-             MY LIST TAB
-        ====================================================== -->
+        <!-- MY LIST TAB -->
         <div id="tab-list" class="hidden" role="tabpanel">
           <div class="list-section">
-
             <div class="list-add-row">
               <input class="field-input" type="text" id="list-input"
                      placeholder="Add an item..."
@@ -855,17 +869,29 @@
                      onkeydown="if(event.key==='Enter') addListItem()" />
               <button class="btn-add" onclick="addListItem()" aria-label="Add item">+</button>
             </div>
-
             <div id="list-count" class="list-count hidden"></div>
             <div id="list-container"></div>
-
             <div id="list-empty" class="list-empty">
               <span class="list-empty-icon">📋</span>
               <div class="list-empty-text">Your list is empty.<br>Add items above to get started.</div>
             </div>
-
           </div>
-        </div><!-- /tab-list -->
+        </div>
+
+        <!-- HISTORY TAB -->
+        <div id="tab-history" class="hidden" role="tabpanel">
+          <div class="history-section">
+            <div class="history-header-row">
+              <div id="history-count" class="history-count hidden"></div>
+              <button class="btn-clear-history" onclick="clearHistory()">Clear All</button>
+            </div>
+            <div id="history-container"></div>
+            <div id="history-empty" class="history-empty">
+              <span class="history-empty-icon">🕐</span>
+              <div class="history-empty-text">No comparisons yet.<br>Your history will appear here.</div>
+            </div>
+          </div>
+        </div>
 
       </div><!-- /container -->
     </div><!-- /notepad-page -->
@@ -876,25 +902,22 @@
     /* ============================================================
        STATE
     ============================================================ */
-    let productCount = 2;
-    let groceryList  = JSON.parse(localStorage.getItem('tindacheck-list') || '[]');
+    let productData       = [{}, {}];
+    let groceryList       = JSON.parse(localStorage.getItem('tindacheck-list')    || '[]');
+    let comparisonHistory = JSON.parse(localStorage.getItem('tindacheck-history') || '[]');
 
 
     /* ============================================================
        TAB SWITCHING
     ============================================================ */
     function switchTab(tab) {
-      const isCompare = tab === 'compare';
-
-      document.getElementById('tab-compare').classList.toggle('hidden', !isCompare);
-      document.getElementById('tab-list').classList.toggle('hidden',    isCompare);
-
-      document.getElementById('tab-btn-compare').classList.toggle('active', isCompare);
-      document.getElementById('tab-btn-list').classList.toggle('active',    !isCompare);
-      document.getElementById('tab-btn-compare').setAttribute('aria-selected', isCompare);
-      document.getElementById('tab-btn-list').setAttribute('aria-selected',    !isCompare);
-
-      if (!isCompare) renderList();
+      ['compare', 'list', 'history'].forEach(t => {
+        document.getElementById(`tab-${t}`).classList.toggle('hidden', t !== tab);
+        document.getElementById(`tab-btn-${t}`).classList.toggle('active', t === tab);
+        document.getElementById(`tab-btn-${t}`).setAttribute('aria-selected', t === tab);
+      });
+      if (tab === 'list')    renderList();
+      if (tab === 'history') renderHistory();
     }
 
 
@@ -909,7 +932,6 @@
       const input = document.getElementById('list-input');
       const name  = input.value.trim();
       if (!name) { input.focus(); return; }
-
       groceryList.push(name);
       saveList();
       renderList();
@@ -942,7 +964,6 @@
       const container = document.getElementById('list-container');
       const emptyEl   = document.getElementById('list-empty');
       const countEl   = document.getElementById('list-count');
-
       container.innerHTML = '';
 
       if (groceryList.length === 0) {
@@ -960,9 +981,7 @@
           <div class="list-item" style="animation-delay:${idx * 0.04}s">
             <div class="list-item-name">${escapeHTML(name)}</div>
             <button class="btn-list-compare"
-                    onclick="compareItem(${JSON.stringify(escapeHTML(name))})">
-              Compare
-            </button>
+                    onclick="compareItem(${JSON.stringify(escapeHTML(name))})">Compare</button>
             <button class="btn-list-remove" onclick="removeListItem(${idx})"
                     aria-label="Remove ${escapeHTML(name)}">×</button>
           </div>
@@ -975,19 +994,19 @@
        UNIT UTILITIES
     ============================================================ */
     function unitFamily(unit) {
-      if (unit === 'g'  || unit === 'kg')   return 'weight';
-      if (unit === 'ml' || unit === 'L')    return 'volume';
+      if (unit === 'g'  || unit === 'kg') return 'weight';
+      if (unit === 'ml' || unit === 'L')  return 'volume';
       return 'piece';
     }
 
-    function toBase(quantity, unit) {
-      if (unit === 'kg') return quantity * 1000;
-      if (unit === 'L')  return quantity * 1000;
-      return quantity;
+    function toBase(qty, unit) {
+      if (unit === 'kg') return qty * 1000;
+      if (unit === 'L')  return qty * 1000;
+      return qty;
     }
 
-    function pricePerUnit(price, quantity, unit) {
-      const base   = toBase(quantity, unit);
+    function pricePerUnit(price, qty, unit) {
+      const base   = toBase(qty, unit);
       const family = unitFamily(unit);
       return family === 'piece' ? price / base : (price / base) * 100;
     }
@@ -1002,28 +1021,44 @@
     /* ============================================================
        RENDER PRODUCT INPUT CARDS
     ============================================================ */
+    const PLACEHOLDERS = [
+      'e.g. Del Monte Tomato Sauce',
+      'e.g. UFC Banana Ketchup',
+      'e.g. Jufran Banana Sauce',
+      'e.g. Heinz Tomato Ketchup',
+      "e.g. Hunt's Tomato Sauce",
+    ];
+
     function renderProducts() {
       const container = document.getElementById('products-container');
       container.innerHTML = '';
 
-      const names        = ['Product 1', 'Product 2', 'Product 3'];
-      const placeholders = [
-        'e.g. Del Monte Tomato Sauce',
-        'e.g. UFC Banana Ketchup',
-        'e.g. Jufran Banana Sauce',
-      ];
+      productData.forEach((saved, i) => {
+        const showRemove = productData.length > 2;
+        const removeBtn  = showRemove
+          ? `<button class="btn-remove-product" onclick="removeProduct(${i})"
+                     aria-label="Remove Item ${i + 1}">×</button>`
+          : '';
 
-      for (let i = 0; i < productCount; i++) {
+        const selOpts = ['g','kg','ml','L','piece'].map(u =>
+          `<option value="${u}" ${(saved.unit || 'g') === u ? 'selected' : ''}>
+            ${u === 'g' ? 'g — grams' : u === 'kg' ? 'kg — kilograms' :
+              u === 'ml' ? 'ml — millilitres' : u === 'L' ? 'L — litres' : 'piece — each'}
+           </option>`
+        ).join('');
+
         container.insertAdjacentHTML('beforeend', `
           <div class="product-card" id="card-${i}">
             <div class="product-card-header">
               <span class="product-badge">ITEM ${i + 1}</span>
-              <span class="product-card-title">${names[i]}</span>
+              <span class="product-card-title">Product ${i + 1}</span>
+              ${removeBtn}
             </div>
             <div class="field-group">
               <label class="field-label" for="name-${i}">Product Name</label>
               <input class="field-input" type="text" id="name-${i}"
-                     placeholder="${placeholders[i]}"
+                     placeholder="${PLACEHOLDERS[i] || 'Product name'}"
+                     value="${escapeHTML(saved.name || '')}"
                      autocomplete="off" autocorrect="off" spellcheck="false" />
             </div>
             <div class="field-row">
@@ -1031,40 +1066,61 @@
                 <label class="field-label" for="price-${i}">Price (₱)</label>
                 <input class="field-input" type="number" id="price-${i}"
                        placeholder="0.00" min="0.01" step="0.01"
-                       inputmode="decimal" />
+                       inputmode="decimal" value="${saved.price || ''}" />
               </div>
               <div class="field-group">
                 <label class="field-label" for="qty-${i}">Quantity</label>
                 <input class="field-input" type="number" id="qty-${i}"
                        placeholder="0" min="0.01" step="any"
-                       inputmode="decimal" />
+                       inputmode="decimal" value="${saved.qty || ''}" />
               </div>
             </div>
             <div class="field-group">
               <label class="field-label" for="unit-${i}">Unit</label>
-              <select class="field-select" id="unit-${i}">
-                <option value="g">g — grams</option>
-                <option value="kg">kg — kilograms</option>
-                <option value="ml">ml — millilitres</option>
-                <option value="L">L — litres</option>
-                <option value="piece">piece — each</option>
-              </select>
+              <select class="field-select" id="unit-${i}">${selOpts}</select>
             </div>
           </div>
         `);
-      }
+      });
+
+      const addBtn = document.getElementById('btn-add-product');
+      if (addBtn) addBtn.classList.toggle('hidden', productData.length >= 5);
     }
 
 
     /* ============================================================
-       TOGGLE BETWEEN 2 AND 3 PRODUCTS
+       ADD / REMOVE PRODUCTS
     ============================================================ */
-    function setProductCount(n) {
-      productCount = n;
-      document.getElementById('btn2').classList.toggle('active', n === 2);
-      document.getElementById('btn3').classList.toggle('active', n === 3);
-      document.getElementById('btn2').setAttribute('aria-pressed', n === 2);
-      document.getElementById('btn3').setAttribute('aria-pressed', n === 3);
+    function saveCurrentValues() {
+      productData.forEach((_, i) => {
+        const nameEl = document.getElementById(`name-${i}`);
+        if (!nameEl) return;
+        productData[i] = {
+          name:  nameEl.value,
+          price: document.getElementById(`price-${i}`).value,
+          qty:   document.getElementById(`qty-${i}`).value,
+          unit:  document.getElementById(`unit-${i}`).value,
+        };
+      });
+    }
+
+    function addProduct() {
+      if (productData.length >= 5) return;
+      saveCurrentValues();
+      productData.push({});
+      hideResults();
+      hideError();
+      renderProducts();
+      setTimeout(() => {
+        const newCard = document.getElementById(`card-${productData.length - 1}`);
+        if (newCard) newCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 80);
+    }
+
+    function removeProduct(i) {
+      if (productData.length <= 2) return;
+      saveCurrentValues();
+      productData.splice(i, 1);
       hideResults();
       hideError();
       renderProducts();
@@ -1077,10 +1133,11 @@
     function compare() {
       hideError();
       hideResults();
+      saveCurrentValues();
 
       const products = [];
 
-      for (let i = 0; i < productCount; i++) {
+      for (let i = 0; i < productData.length; i++) {
         const nameRaw = document.getElementById(`name-${i}`).value.trim();
         const name    = nameRaw || `Product ${i + 1}`;
         const price   = parseFloat(document.getElementById(`price-${i}`).value);
@@ -1159,13 +1216,16 @@
             <div class="result-per-unit">
               ${priceStr}<span class="result-unit-label">${label}</span>
             </div>
-            <div class="result-original">
-              ₱${p.price.toFixed(2)} for ${p.qty}${p.unit}
-            </div>
+            <div class="result-original">₱${p.price.toFixed(2)} for ${p.qty}${p.unit}</div>
             ${savingsHTML}
           </div>
         `);
       });
+
+      // Save to history
+      comparisonHistory.unshift({ ts: Date.now(), products, winnerIdx });
+      if (comparisonHistory.length > 20) comparisonHistory.pop();
+      localStorage.setItem('tindacheck-history', JSON.stringify(comparisonHistory));
 
       document.getElementById('results-section').classList.remove('hidden');
       setTimeout(() => {
@@ -1179,10 +1239,65 @@
        RESET
     ============================================================ */
     function resetApp() {
+      productData = [{}, {}];
       hideResults();
       hideError();
       renderProducts();
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+
+    /* ============================================================
+       HISTORY
+    ============================================================ */
+    function renderHistory() {
+      const container = document.getElementById('history-container');
+      const emptyEl   = document.getElementById('history-empty');
+      const countEl   = document.getElementById('history-count');
+      container.innerHTML = '';
+
+      if (comparisonHistory.length === 0) {
+        emptyEl.classList.remove('hidden');
+        countEl.classList.add('hidden');
+        return;
+      }
+
+      emptyEl.classList.add('hidden');
+      countEl.classList.remove('hidden');
+      countEl.textContent = `${comparisonHistory.length} comparison${comparisonHistory.length !== 1 ? 's' : ''}`;
+
+      comparisonHistory.forEach((entry, idx) => {
+        const date  = new Date(entry.ts);
+        const label = date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
+                    + ' · ' + date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+
+        const rows = entry.products.map((p, i) => {
+          const isWinner = i === entry.winnerIdx;
+          const lbl      = unitLabel(p.family);
+          return `
+            <div class="history-product-row">
+              <div class="history-product-name">${escapeHTML(p.name)}</div>
+              <div class="history-product-price">₱${p.perUnit.toFixed(2)}
+                <span style="font-weight:400;color:var(--ink-faded)">${lbl}</span>
+              </div>
+              ${isWinner ? '<span class="history-winner-badge">BEST</span>' : ''}
+            </div>`;
+        }).join('');
+
+        container.insertAdjacentHTML('beforeend', `
+          <div class="history-entry" style="animation-delay:${idx * 0.05}s">
+            <div class="history-entry-meta">${escapeHTML(label)}</div>
+            ${rows}
+          </div>
+        `);
+      });
+    }
+
+    function clearHistory() {
+      if (comparisonHistory.length === 0) return;
+      comparisonHistory = [];
+      localStorage.removeItem('tindacheck-history');
+      renderHistory();
     }
 
 
@@ -1195,21 +1310,13 @@
       el.classList.remove('hidden');
     }
 
-    function hideError() {
-      document.getElementById('error-banner').classList.add('hidden');
-    }
-
-    function hideResults() {
-      document.getElementById('results-section').classList.add('hidden');
-    }
+    function hideError()   { document.getElementById('error-banner').classList.add('hidden'); }
+    function hideResults() { document.getElementById('results-section').classList.add('hidden'); }
 
     function escapeHTML(str) {
       return str
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
     }
 
 
