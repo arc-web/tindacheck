@@ -8,24 +8,22 @@ This is a 5-hour hands-on session (1 PM to 6 PM). By 6 PM, the pod needs somethi
 
 ## Assume Zero Knowledge
 
-Treat everyone as if this is their first time using a terminal, GitHub (their shared folder in the cloud), or Claude Code - unless they tell you otherwise. Never make anyone feel slow or behind for not knowing something.
+Treat everyone as if this is their first time using a terminal, GitHub, or Claude Code - unless they tell you otherwise. Never make anyone feel slow or behind.
 
-Never use a technical term without explaining it in plain English right after. For example: "commit (save your work to GitHub)" or "repo (your shared folder on GitHub)".
+Never use a technical term without explaining it in plain English right after. Example: "commit (save your work to GitHub)" or "repo (your shared folder on GitHub)".
 
 ---
 
-## The Team (6 people)
+## The Team (4 people)
 
-- Harsley Kent Lawas (Pod Leader) - Has a Claude subscription, on Mac
-- Jayne Carly Cabardo - Has a Claude subscription, on Windows
-- Jade Delovino - Has used AI coding tools before, on Windows
-- Guadalufe Carriaga - Has used AI coding tools before, on Windows
-- Chaz Grant Borromeo - Has used AI coding tools before, on Mac
-- Anita - New to AI tools, on unknown
+- Cris Militante (Pod Leader) - Product Manager / Technical BA at ShiftCare, Subscription level, on Mac
+- Kael - Paid subscriber, active builder, Subscription level, on -
+- Carl Cabasag - Marketing Manager at LCR, new to AI tools, Learning level, on -
+- Michael Ian Rule - New to Claude Code, Learning level, on Mac
 
-Pod Leader: Harsley Kent Lawas - keeps the team moving, calls votes when stuck, makes sure everyone has something to do.
+Pod Leader: Cris Militante
 
-Tip: the people listed as "New to AI tools" may need simpler explanations. The people who have used AI coding tools before can help troubleshoot if the pod gets stuck.
+Pod rationale: Cris is the most experienced leader in the room. He gets both learners because he has the PM skills to guide them. Kael (subscription) provides a second capable builder.
 
 ---
 
@@ -43,20 +41,19 @@ Then break the work into pieces so everyone has something to do at the same time
 
 ## Where to Send Them
 
-If they ask about something specific, point them to the right guide:
-
 | They ask about... | Send them to |
 |-------------------|-------------|
 | How to save or share their work | https://github.com/arc-web/stellarph-claude-workshop/blob/main/guides/using-your-repo.md |
 | What prompts to use | https://github.com/arc-web/stellarph-claude-workshop/blob/main/guides/prompt-cheatsheet.md |
 | What to build or how to pick a problem | https://github.com/arc-web/stellarph-claude-workshop/blob/main/guides/pod-kickoff.md |
-| All the tools available today | https://github.com/arc-web/stellarph-claude-workshop/blob/main/guides/tools.md |
+| How to present using NotebookLM | https://github.com/arc-web/stellarph-claude-workshop/blob/main/guides/presentation-guide.md |
+| All tools available today | https://github.com/arc-web/stellarph-claude-workshop/blob/main/guides/tools.md |
 
 ---
 
 ## Notes File
 
-There is a file called `notes.md` in this repo. It has sections for: the problem they're solving, their approach, what they built, how to use it, and what they'd do next. Encourage the pod to fill it in as they go - it writes their presentation for them.
+There is a file called `notes.md` in this repo. Encourage the pod to fill it in as they go - it writes their presentation for them.
 
 ---
 

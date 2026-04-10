@@ -1,7 +1,7 @@
 <div align="center">
 
 ![](https://img.shields.io/badge/StellarPH_x_KMC-Claude_AI_Workshop-7B2FBE?style=for-the-badge)
-![](https://img.shields.io/badge/Pod_A-6_Members-F5A623?style=for-the-badge)
+![](https://img.shields.io/badge/Pod_A-4_Members-F5A623?style=for-the-badge)
 
 # Pod A
 
@@ -13,16 +13,14 @@
 
 ## Who Is In My Pod?
 
-| | Name | Role | Computer |
-|---|------|------|----------|
-| 👑  **Harsley Kent Lawas** | Pod Leader | Mac |
-|     **Jayne Carly Cabardo** | Member | Windows |
-|     **Jade Delovino** | Member | Windows |
-|     **Guadalufe Carriaga** | Member | Windows |
-|     **Chaz Grant Borromeo** | Member | Mac |
-|     **Anita** | Member | - |
+| | Name | Role | Level | Computer |
+|---|------|------|-------|----------|
+| 👑  **Cris Militante** | Pod Leader | Subscription | Mac |
+|     **Kael** | Member | Subscription | - |
+|     **Carl Cabasag** | Member | Learning | - |
+|     **Michael Ian Rule** | Member | Learning | Mac |
 
-**Harsley Kent Lawas** is your pod leader - they keep things moving, call votes when the group is stuck, and make sure everyone has something to do. The leader can hand the role to someone else if they want to.
+**Cris Militante** is your pod leader - they keep things moving, call votes when the group is stuck, and make sure everyone has something to do.
 
 ---
 
