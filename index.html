@@ -821,6 +821,121 @@
     }
 
     /* ============================================================
+       GROCERY RUN
+    ============================================================ */
+    .run-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px;
+      background: var(--best-soft);
+      border-bottom: 1px solid var(--best);
+    }
+    .run-banner.hidden { display: none !important; }
+    .run-banner-left { display: flex; align-items: center; gap: 10px; }
+    .run-banner-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: var(--best);
+      flex-shrink: 0;
+      animation: runPulse 1.6s ease-in-out infinite;
+    }
+    @keyframes runPulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.5; transform: scale(0.85); }
+    }
+    .run-banner-label { font-size: 13px; font-weight: 700; color: var(--best); }
+    .run-banner-time  { font-size: 11px; color: var(--text-3); margin-top: 1px; }
+    .btn-end-run {
+      font-size: 12px; font-weight: 700;
+      color: var(--best);
+      background: transparent;
+      border: 1.5px solid var(--best);
+      border-radius: 8px;
+      padding: 6px 14px;
+      cursor: pointer;
+      white-space: nowrap;
+      -webkit-tap-highlight-color: transparent;
+      transition: background 0.15s, color 0.15s;
+    }
+    .btn-end-run:active { background: var(--best); color: #fff; }
+
+    /* Cart run actions */
+    .cart-run-actions { margin-top: 20px; }
+    .btn-start-run {
+      display: block; width: 100%; height: 52px;
+      background: var(--best-soft);
+      color: var(--best);
+      border: 1.5px solid var(--best);
+      border-radius: 14px;
+      font-size: 15px; font-weight: 700;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: background 0.15s;
+    }
+    .btn-start-run:active { background: var(--best); color: #fff; }
+    .btn-end-run-cart {
+      display: block; width: 100%; height: 52px;
+      background: var(--best);
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      font-size: 15px; font-weight: 700;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: opacity 0.15s;
+    }
+    .btn-end-run-cart:active { opacity: 0.85; }
+
+    /* Run history */
+    .history-group-label {
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 1.2px; text-transform: uppercase;
+      color: var(--text-3);
+      margin-bottom: 12px;
+    }
+    .run-entry {
+      background: var(--surface-1);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      margin-bottom: 10px;
+      overflow: hidden;
+      opacity: 0;
+      animation: fadeUp 0.22s ease forwards;
+    }
+    .run-entry-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 13px 16px;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .run-entry-header:active { background: var(--surface-2); }
+    .run-entry-date { font-size: 13px; font-weight: 600; color: var(--text); }
+    .run-entry-meta { font-size: 12px; color: var(--text-3); margin-top: 2px; }
+    .run-entry-total { font-size: 16px; font-weight: 700; color: var(--best); white-space: nowrap; }
+    .run-entry-items {
+      border-top: 1px solid var(--border);
+      padding: 10px 16px 14px;
+      display: none;
+    }
+    .run-entry-items.open { display: block; }
+    .run-item-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 5px 0;
+      font-size: 13px;
+      border-bottom: 1px solid var(--border);
+    }
+    .run-item-row:last-child { border-bottom: none; }
+    .run-item-name { color: var(--text); flex: 1; }
+    .run-item-price { color: var(--text-2); font-weight: 600; white-space: nowrap; margin-left: 12px; }
+    .runs-empty { padding: 20px 0; }
+    .runs-empty-text { font-size: 14px; color: var(--text-3); line-height: 1.6; }
+
+    /* ============================================================
        SHOPPING CART TAB
     ============================================================ */
     .cart-section { padding-top: 20px; }
@@ -1048,6 +1163,18 @@
       </button>
     </header>
 
+    <!-- ACTIVE RUN BANNER -->
+    <div id="run-banner" class="run-banner hidden">
+      <div class="run-banner-left">
+        <span class="run-banner-dot"></span>
+        <div>
+          <div class="run-banner-label">Grocery Run Active</div>
+          <div id="run-banner-time" class="run-banner-time"></div>
+        </div>
+      </div>
+      <button class="btn-end-run" onclick="endRun()">End Run</button>
+    </div>
+
     <!-- TABS -->
     <nav class="tab-nav" role="tablist">
       <button class="tab-btn active" id="tab-btn-compare"
@@ -1126,12 +1253,31 @@
             <span class="cart-empty-icon">🛒</span>
             <div class="cart-empty-text">Your cart is empty.<br>Compare products and add the best deal.</div>
           </div>
+          <!-- Start / End Run actions -->
+          <div id="cart-run-actions" class="cart-run-actions">
+            <button id="btn-start-run" class="btn-start-run" onclick="startRun()">
+              🛍️ Start Grocery Run
+            </button>
+            <button id="btn-end-run-cart" class="btn-end-run-cart hidden" onclick="endRun()">
+              ✓ End Run &amp; Save
+            </button>
+          </div>
         </div>
       </div>
 
       <!-- HISTORY TAB -->
       <div id="tab-history" class="hidden" role="tabpanel">
         <div class="history-section">
+
+          <!-- Grocery Runs section -->
+          <div class="history-group-label">Grocery Runs</div>
+          <div id="runs-container"></div>
+          <div id="runs-empty" class="runs-empty hidden">
+            <div class="runs-empty-text">No grocery runs yet.<br>Start a run to track your shopping trips.</div>
+          </div>
+
+          <!-- Comparison history section -->
+          <div class="history-group-label" style="margin-top: 28px;">Price Comparisons</div>
           <div class="history-header-row">
             <div id="history-count" class="history-count hidden"></div>
             <button class="btn-clear-history" onclick="clearHistory()">Clear All</button>
@@ -1141,6 +1287,7 @@
             <span class="history-empty-icon">🕐</span>
             <div class="history-empty-text">No comparisons yet.<br>Your history will appear here.</div>
           </div>
+
         </div>
       </div>
 
@@ -1156,6 +1303,8 @@
     let comparisonHistory = JSON.parse(localStorage.getItem('tindacheck-history') || '[]');
     let shoppingCart      = JSON.parse(localStorage.getItem('tindacheck-cart')    || '[]');
     let currentProducts   = {}; // keyed by originalIndex, populated in compare()
+    let activeRun         = JSON.parse(localStorage.getItem('tindacheck-active-run') || 'null');
+    let runHistory        = JSON.parse(localStorage.getItem('tindacheck-runs')       || '[]');
 
     // groceryList stores objects: { name, size, unit }
     // Migrate old string-array format to object format automatically
@@ -1197,7 +1346,7 @@
       });
       if (tab === 'list')    renderList();
       if (tab === 'cart')    renderCart();
-      if (tab === 'history') renderHistory();
+      if (tab === 'history') { renderRunHistory(); renderHistory(); }
     }
 
 
@@ -1700,6 +1849,116 @@
 
 
     /* ============================================================
+       GROCERY RUN
+    ============================================================ */
+    function startRun() {
+      activeRun = { startedAt: Date.now() };
+      localStorage.setItem('tindacheck-active-run', JSON.stringify(activeRun));
+      renderRunBanner();
+      renderCart(); // refresh buttons
+      showScanToast('Grocery run started! Add items to your cart.');
+    }
+
+    function endRun() {
+      if (!activeRun) return;
+      if (shoppingCart.length === 0) {
+        showScanToast('Add items to your cart before ending the run.');
+        return;
+      }
+      const total = shoppingCart.reduce((sum, i) => sum + i.price, 0);
+      const run = {
+        id:        activeRun.startedAt,
+        startedAt: activeRun.startedAt,
+        endedAt:   Date.now(),
+        items:     [...shoppingCart],
+        total,
+      };
+      runHistory.unshift(run);
+      if (runHistory.length > 30) runHistory.pop();
+      localStorage.setItem('tindacheck-runs', JSON.stringify(runHistory));
+
+      // Clear active run and cart
+      activeRun = null;
+      localStorage.removeItem('tindacheck-active-run');
+      shoppingCart = [];
+      localStorage.removeItem('tindacheck-cart');
+      updateCartBadge();
+
+      renderRunBanner();
+      renderCart();
+      switchTab('history');
+      showScanToast(`Run saved — ₱${total.toFixed(2)} across ${run.items.length} item${run.items.length > 1 ? 's' : ''}.`);
+    }
+
+    function renderRunBanner() {
+      const banner     = document.getElementById('run-banner');
+      const timeEl     = document.getElementById('run-banner-time');
+      const startBtn   = document.getElementById('btn-start-run');
+      const endCartBtn = document.getElementById('btn-end-run-cart');
+      if (!banner) return;
+
+      if (activeRun) {
+        banner.classList.remove('hidden');
+        const d = new Date(activeRun.startedAt);
+        timeEl.textContent = 'Started ' + d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+        if (startBtn)   startBtn.classList.add('hidden');
+        if (endCartBtn) endCartBtn.classList.remove('hidden');
+      } else {
+        banner.classList.add('hidden');
+        if (startBtn)   startBtn.classList.remove('hidden');
+        if (endCartBtn) endCartBtn.classList.add('hidden');
+      }
+    }
+
+    function renderRunHistory() {
+      const container = document.getElementById('runs-container');
+      const emptyEl   = document.getElementById('runs-empty');
+      if (!container) return;
+      container.innerHTML = '';
+
+      if (runHistory.length === 0) {
+        emptyEl.classList.remove('hidden');
+        return;
+      }
+      emptyEl.classList.add('hidden');
+
+      runHistory.forEach((run, idx) => {
+        const start    = new Date(run.startedAt);
+        const end      = new Date(run.endedAt);
+        const dateStr  = start.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+        const timeStr  = start.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+        const duration = Math.round((run.endedAt - run.startedAt) / 60000);
+        const durationStr = duration < 60
+          ? `${duration} min`
+          : `${Math.floor(duration / 60)}h ${duration % 60}m`;
+
+        const itemRows = run.items.map(item => `
+          <div class="run-item-row">
+            <span class="run-item-name">${escapeHTML(item.name || 'Unnamed')}</span>
+            <span class="run-item-price">₱${item.price.toFixed(2)}</span>
+          </div>`).join('');
+
+        container.insertAdjacentHTML('beforeend', `
+          <div class="run-entry" style="animation-delay:${idx * 0.05}s">
+            <div class="run-entry-header" onclick="toggleRunEntry(this)">
+              <div>
+                <div class="run-entry-date">${escapeHTML(dateStr)} · ${escapeHTML(timeStr)}</div>
+                <div class="run-entry-meta">${run.items.length} item${run.items.length > 1 ? 's' : ''} · ${durationStr}</div>
+              </div>
+              <div class="run-entry-total">₱${run.total.toFixed(2)}</div>
+            </div>
+            <div class="run-entry-items">${itemRows}</div>
+          </div>`);
+      });
+    }
+
+    function toggleRunEntry(header) {
+      const items = header.nextElementSibling;
+      items.classList.toggle('open');
+    }
+
+
+    /* ============================================================
        SHOPPING CART
     ============================================================ */
     function saveCart() {
@@ -2028,6 +2287,7 @@
     initTheme();
     renderProducts();
     updateCartBadge();
+    renderRunBanner();
 
   </script>
 
