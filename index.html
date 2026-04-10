@@ -7,51 +7,46 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>TindaCheck — Grocery Price Comparison</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&display=swap" rel="stylesheet">
   <style>
 
     /* ============================================================
-       CSS RESET & CUSTOM PROPERTIES
+       RESET
     ============================================================ */
-    *, *::before, *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+    /* ============================================================
+       DESIGN TOKENS
+    ============================================================ */
     :root {
-      /* Primary — deep ink */
-      --green-dark:    #0f0f1a;
-      --green:         #1a1a2e;
-      --green-mid:     #22223b;
-      --green-light:   #4a4e69;
-      --green-pale:    #f0eff8;
+      --paper:          #fefce8;   /* legal-pad yellow-cream          */
+      --paper-alt:      #fff9d6;   /* slightly richer cream            */
+      --line-color:     #b8d4e8;   /* college-rule blue                */
+      --margin-color:   rgba(205, 72, 72, 0.38); /* red margin line   */
+      --margin-x:       54px;      /* distance of margin from left     */
+      --line-gap:       32px;      /* vertical distance between lines  */
 
-      /* Accent — warm gold */
-      --orange-dark:   #9a7b2f;
-      --orange:        #c9a84c;
-      --orange-light:  #e2c16b;
-      --orange-pale:   #fdf8ec;
+      --ink:            #1a190e;
+      --ink-mid:        #3b3924;
+      --ink-faded:      #7a785a;
+      --ink-blue:       #1e3a6e;
+      --ink-blue-mid:   #2e5299;
+      --ink-blue-light: #4a72b0;
+      --ink-red:        #b83232;
 
-      /* Neutrals */
-      --white:         #FFFFFF;
-      --gray-50:       #faf9f7;
-      --gray-100:      #f4f3f0;
-      --gray-200:      #e8e6e1;
-      --gray-300:      #d4d0c8;
-      --gray-400:      #b0ab9e;
-      --gray-500:      #8a8478;
-      --gray-600:      #635e54;
-      --gray-700:      #4a4540;
-      --gray-800:      #2e2b27;
-      --text:          #1a1815;
+      --highlight:      rgba(255, 243, 60, 0.45);
+      --highlight-bg:   #fffce0;
 
-      /* Misc */
-      --radius-sm:     8px;
-      --radius:        14px;
-      --radius-lg:     20px;
-      --shadow-sm:     0 1px 4px rgba(0,0,0,0.07);
-      --shadow:        0 2px 12px rgba(0,0,0,0.09);
-      --shadow-lg:     0 6px 24px rgba(0,0,0,0.13);
+      --binding:        #2e2c1a;
+      --board:          #b89660;
+
+      --white:          #ffffff;
+      --shadow-lift:    2px 3px 10px rgba(0,0,0,0.18), 0 0 1px rgba(0,0,0,0.06);
+      --shadow-page:    6px 6px 28px rgba(0,0,0,0.28), -1px 0 6px rgba(0,0,0,0.06);
+
+      --radius-sm:      4px;
+      --radius:         6px;
     }
 
     /* ============================================================
@@ -60,239 +55,307 @@
     html {
       font-size: 16px;
       -webkit-text-size-adjust: 100%;
+      height: 100%;
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-                   'Helvetica Neue', Arial, sans-serif;
-      background: var(--gray-100);
-      color: var(--text);
-      min-height: 100vh;
-      padding-bottom: 48px;
-      max-width: 480px;
-      margin: 0 auto;
-      letter-spacing: 0.01em;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+      min-height: 100%;
+      /* Cork-board body */
+      background-color: var(--board);
+      background-image:
+        radial-gradient(ellipse at 30% 20%, rgba(255,255,255,0.07) 0%, transparent 55%),
+        radial-gradient(ellipse at 75% 80%, rgba(0,0,0,0.08)       0%, transparent 50%),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.12'/%3E%3C/svg%3E");
+      display: flex;
+      justify-content: center;
+      padding: 24px 0 48px;
     }
 
     /* ============================================================
-       APP HEADER
+       NOTEPAD WRAPPER  (the physical pad on the cork board)
     ============================================================ */
-    .app-header {
-      background: var(--green-dark);
-      color: white;
-      padding: 32px 20px 36px;
-      text-align: center;
+    .notepad {
+      width: 100%;
+      max-width: 480px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow-page);
+    }
+
+    /* ============================================================
+       SPIRAL BINDING  (top strip with holes)
+    ============================================================ */
+    .notepad-binding {
+      background: var(--binding);
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      padding: 0 28px;
+      flex-shrink: 0;
+    }
+
+    .ring-hole {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--board);
+      border: 3px solid #555540;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.40), 0 1px 2px rgba(255,255,255,0.06);
+    }
+
+    /* ============================================================
+       PAPER PAGE  (lined background + red margin)
+    ============================================================ */
+    .notepad-page {
       position: relative;
+      flex: 1;
+      background-color: var(--paper);
+      /* Ruled lines + red margin in one background declaration */
+      background-image:
+        linear-gradient(
+          to right,
+          transparent var(--margin-x),
+          var(--margin-color) var(--margin-x),
+          var(--margin-color) calc(var(--margin-x) + 1px),
+          transparent calc(var(--margin-x) + 1px)
+        ),
+        repeating-linear-gradient(
+          to bottom,
+          transparent,
+          transparent calc(var(--line-gap) - 1px),
+          var(--line-color) calc(var(--line-gap) - 1px),
+          var(--line-color) var(--line-gap)
+        );
+      background-size: 100% 100%, 100% var(--line-gap);
+      /* Offset lines so they start below the header */
+      background-position: 0 0, 0 0;
+      /* Subtle paper grain overlay via box-shadow trick */
       overflow: hidden;
     }
 
-    /* Gold accent line at bottom of header */
-    .app-header::after {
+    /* Paper grain noise overlay */
+    .notepad-page::after {
       content: '';
       position: absolute;
-      bottom: 0; left: 10%; right: 10%;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, var(--orange), transparent);
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+      opacity: 1;
     }
 
-    /* Subtle radial glow */
-    .app-header::before {
-      content: '';
-      position: absolute;
-      top: -60px; left: 50%;
-      transform: translateX(-50%);
-      width: 300px; height: 200px;
-      border-radius: 50%;
-      background: radial-gradient(ellipse, rgba(201,168,76,0.12) 0%, transparent 70%);
-      pointer-events: none;
+    /* All direct children of the page sit above the grain overlay */
+    .notepad-page > * { position: relative; z-index: 1; }
+
+    /* ============================================================
+       APP HEADER  (top of the paper)
+    ============================================================ */
+    .app-header {
+      padding: 28px 20px 18px var(--margin-x);
+      border-bottom: 2px solid var(--ink-blue-mid);
+      margin-bottom: 2px;
     }
 
     .header-logo {
-      font-size: 38px;
+      font-size: 28px;
       line-height: 1;
-      margin-bottom: 6px;
       display: block;
+      margin-bottom: 2px;
     }
 
     .header-title {
-      font-size: 26px;
+      font-family: 'Kalam', cursive;
+      font-size: 32px;
       font-weight: 700;
-      letter-spacing: 0.5px;
-      color: var(--orange-light);
+      color: var(--ink-blue);
+      line-height: 1.1;
+      letter-spacing: -0.5px;
     }
 
     .header-subtitle {
-      font-size: 12px;
-      opacity: 0.55;
-      margin-top: 6px;
-      font-weight: 400;
-      letter-spacing: 2px;
-      text-transform: uppercase;
+      font-family: 'Kalam', cursive;
+      font-size: 13px;
+      color: var(--ink-faded);
+      margin-top: 2px;
+      font-weight: 300;
     }
 
     /* ============================================================
-       TAB NAVIGATION
+       TAB NAVIGATION  (folder-tab style)
     ============================================================ */
     .tab-nav {
       display: flex;
-      background: var(--green-mid);
-      position: sticky;
-      top: 0;
-      z-index: 10;
+      border-bottom: 2px solid var(--line-color);
+      margin: 0;
+      padding: 0 0 0 var(--margin-x);
+      gap: 4px;
+      background: transparent;
     }
 
     .tab-btn {
-      flex: 1;
-      height: 48px;
-      background: transparent;
-      color: rgba(255,255,255,0.45);
-      border: none;
-      font-size: 13px;
+      font-family: 'Kalam', cursive;
+      font-size: 14px;
       font-weight: 700;
-      letter-spacing: 1.2px;
-      text-transform: uppercase;
+      color: var(--ink-faded);
+      background: transparent;
+      border: none;
+      padding: 10px 18px 8px;
       cursor: pointer;
       position: relative;
-      transition: color 0.2s;
+      letter-spacing: 0.2px;
       -webkit-tap-highlight-color: transparent;
-    }
-
-    .tab-btn::after {
-      content: '';
-      position: absolute;
-      bottom: 0; left: 20%; right: 20%;
-      height: 2px;
-      background: var(--orange);
-      border-radius: 2px 2px 0 0;
-      transform: scaleX(0);
-      transition: transform 0.2s;
+      transition: color 0.18s;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
     }
 
     .tab-btn.active {
-      color: var(--orange-light);
-    }
-
-    .tab-btn.active::after {
-      transform: scaleX(1);
+      color: var(--ink-blue);
+      border-bottom: 3px solid var(--ink-blue);
     }
 
     /* ============================================================
-       LAYOUT CONTAINER
+       CONTAINER  (inner padding area)
     ============================================================ */
     .container {
-      padding: 0 16px;
+      padding: 0 16px 32px;
     }
 
     /* ============================================================
-       PRODUCT COUNT TOGGLE (2 or 3 items)
+       PRODUCT COUNT TOGGLE
     ============================================================ */
     .toggle-section {
       display: flex;
       align-items: center;
-      justify-content: center;
-      gap: 12px;
-      padding: 20px 0 4px;
+      gap: 10px;
+      padding: 20px 0 4px var(--margin-x);
     }
 
     .toggle-label {
+      font-family: 'Kalam', cursive;
       font-size: 14px;
-      font-weight: 600;
-      color: var(--gray-600);
+      font-weight: 400;
+      color: var(--ink-faded);
     }
 
     .toggle-group {
       display: flex;
-      background: var(--gray-200);
-      border-radius: 30px;
-      padding: 3px;
-      gap: 2px;
+      gap: 6px;
     }
 
     .toggle-btn {
-      border: none;
+      border: 1.5px solid var(--line-color);
       background: transparent;
-      padding: 8px 20px;
-      border-radius: 27px;
+      padding: 5px 16px;
+      border-radius: 3px;
+      font-family: 'Kalam', cursive;
       font-size: 14px;
       font-weight: 700;
       cursor: pointer;
-      color: var(--gray-600);
-      transition: background 0.2s, color 0.2s, box-shadow 0.2s;
-      min-height: 40px;
+      color: var(--ink-faded);
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+      min-height: 36px;
       -webkit-tap-highlight-color: transparent;
-      line-height: 1;
     }
 
     .toggle-btn.active {
-      background: var(--green);
-      color: var(--orange-light);
-      box-shadow: 0 2px 8px rgba(15, 15, 26, 0.25);
+      background: var(--ink-blue);
+      color: var(--paper);
+      border-color: var(--ink-blue);
     }
 
     /* ============================================================
-       PRODUCT INPUT CARDS
+       PRODUCT INPUT CARDS  (white paper on top of lined pad)
     ============================================================ */
     .product-card {
       background: var(--white);
       border-radius: var(--radius);
-      padding: 20px 18px;
+      padding: 16px 16px 12px;
       margin-top: 14px;
-      box-shadow: var(--shadow);
-      border-left: 3px solid var(--orange);
+      box-shadow: var(--shadow-lift);
+      /* Slight clockwise tilt for realism — alternates via nth-child */
+      position: relative;
+    }
+
+    .product-card:nth-child(even) {
+      transform: rotate(0.4deg);
+    }
+    .product-card:nth-child(odd) {
+      transform: rotate(-0.3deg);
+    }
+
+    /* Tape strip at top of each card */
+    .product-card::before {
+      content: '';
+      position: absolute;
+      top: -9px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 52px;
+      height: 18px;
+      background: rgba(255, 243, 100, 0.70);
+      border-radius: 2px;
+      border: 1px solid rgba(200, 185, 80, 0.40);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
     }
 
     .product-card-header {
       display: flex;
       align-items: center;
-      gap: 10px;
-      margin-bottom: 16px;
+      gap: 8px;
+      margin-bottom: 14px;
+      padding-bottom: 8px;
+      border-bottom: 1.5px solid var(--line-color);
     }
 
     .product-badge {
-      background: var(--green);
-      color: var(--orange-light);
-      font-size: 10px;
+      font-family: 'Kalam', cursive;
+      font-size: 11px;
       font-weight: 700;
-      padding: 4px 10px;
-      border-radius: 4px;
-      letter-spacing: 1.5px;
-      flex-shrink: 0;
+      color: var(--ink-red);
+      letter-spacing: 1px;
     }
 
     .product-card-title {
+      font-family: 'Kalam', cursive;
       font-size: 16px;
       font-weight: 700;
-      color: var(--gray-800);
+      color: var(--ink-blue);
     }
 
     /* ============================================================
-       FORM FIELDS
+       FORM FIELDS  (underline-only style — like writing on a line)
     ============================================================ */
     .field-group {
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
 
     .field-label {
       display: block;
-      font-size: 12px;
+      font-family: 'Kalam', cursive;
+      font-size: 11px;
       font-weight: 700;
-      color: var(--gray-600);
+      color: var(--ink-faded);
       text-transform: uppercase;
-      letter-spacing: 0.6px;
-      margin-bottom: 6px;
+      letter-spacing: 0.8px;
+      margin-bottom: 4px;
     }
 
     .field-input,
     .field-select {
       width: 100%;
-      height: 52px;
-      border: 2px solid var(--gray-200);
-      border-radius: var(--radius-sm);
-      padding: 0 14px;
+      height: 44px;
+      border: none;
+      border-bottom: 1.5px solid var(--line-color);
+      border-radius: 0;
+      padding: 0 4px;
+      font-family: 'Kalam', cursive;
       font-size: 16px;
-      color: var(--text);
-      background: var(--gray-50);
-      transition: border-color 0.18s, background 0.18s;
+      color: var(--ink);
+      background: transparent;
+      transition: border-color 0.18s;
       -webkit-appearance: none;
       appearance: none;
     }
@@ -300,90 +363,100 @@
     .field-input:focus,
     .field-select:focus {
       outline: none;
-      border-color: var(--green-light);
-      background: var(--white);
+      border-bottom-color: var(--ink-blue);
+      border-bottom-width: 2px;
+    }
+
+    .field-input::placeholder {
+      color: var(--line-color);
+      font-weight: 300;
     }
 
     .field-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 10px;
+      gap: 14px;
     }
 
     .field-select {
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7' viewBox='0 0 12 7'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23757575' stroke-width='1.8' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7' viewBox='0 0 12 7'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23b8d4e8' stroke-width='1.8' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
       background-repeat: no-repeat;
-      background-position: right 14px center;
-      padding-right: 36px;
+      background-position: right 4px center;
+      padding-right: 24px;
       cursor: pointer;
     }
 
     .field-select:focus {
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7' viewBox='0 0 12 7'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%234a4e69' stroke-width='1.8' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-      background-color: var(--white);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7' viewBox='0 0 12 7'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%232e5299' stroke-width='1.8' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
     }
 
     /* ============================================================
        ACTION BUTTONS
     ============================================================ */
+
+    /* Primary — Compare (rubber stamp look) */
     .btn-compare {
       display: block;
-      width: 100%;
-      height: 60px;
-      background: var(--green-dark);
-      color: var(--orange-light);
-      border: 1px solid var(--orange);
-      border-radius: var(--radius);
-      font-size: 16px;
+      width: calc(100% - var(--margin-x));
+      margin-left: var(--margin-x);
+      height: 54px;
+      background: var(--ink-blue);
+      color: var(--paper);
+      border: none;
+      border-radius: var(--radius-sm);
+      font-family: 'Kalam', cursive;
+      font-size: 18px;
       font-weight: 700;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
+      letter-spacing: 0.5px;
       cursor: pointer;
-      margin-top: 22px;
-      box-shadow: 0 4px 20px rgba(15, 15, 26, 0.18);
-      transition: transform 0.12s, box-shadow 0.12s, background 0.15s;
+      margin-top: 20px;
+      box-shadow: 3px 4px 0px var(--ink-blue-mid), var(--shadow-lift);
+      transition: transform 0.1s, box-shadow 0.1s;
       -webkit-tap-highlight-color: transparent;
+      position: relative;
     }
 
     .btn-compare:active {
-      transform: scale(0.97);
-      background: var(--green-mid);
-      box-shadow: 0 2px 8px rgba(15, 15, 26, 0.12);
+      transform: translate(2px, 3px);
+      box-shadow: 1px 1px 0px var(--ink-blue-mid);
     }
 
+    /* Secondary — Reset */
     .btn-reset {
       display: block;
-      width: 100%;
-      height: 52px;
-      background: var(--white);
-      color: var(--gray-700);
-      border: 2px solid var(--gray-300);
-      border-radius: var(--radius);
+      width: calc(100% - var(--margin-x));
+      margin-left: var(--margin-x);
+      height: 44px;
+      background: transparent;
+      color: var(--ink-faded);
+      border: 1.5px dashed var(--line-color);
+      border-radius: var(--radius-sm);
+      font-family: 'Kalam', cursive;
       font-size: 15px;
-      font-weight: 700;
+      font-weight: 400;
       cursor: pointer;
-      margin-top: 12px;
-      transition: background 0.15s, border-color 0.15s;
+      margin-top: 10px;
+      transition: border-color 0.15s, color 0.15s;
       -webkit-tap-highlight-color: transparent;
     }
 
     .btn-reset:active {
-      background: var(--gray-100);
-      border-color: var(--gray-400);
+      border-color: var(--ink-faded);
+      color: var(--ink-mid);
     }
 
     /* ============================================================
-       ERROR MESSAGE
+       ERROR BANNER
     ============================================================ */
     .error-banner {
-      background: #FFEBEE;
-      color: #B71C1C;
-      border-left: 4px solid #EF5350;
-      border-radius: var(--radius-sm);
-      padding: 14px 16px;
+      background: #fff0f0;
+      color: var(--ink-red);
+      border-left: 3px solid var(--ink-red);
+      padding: 12px 14px;
+      font-family: 'Kalam', cursive;
       font-size: 14px;
-      font-weight: 500;
-      margin-top: 16px;
+      font-weight: 400;
+      margin-top: 14px;
       line-height: 1.4;
     }
 
@@ -391,27 +464,33 @@
        RESULTS SECTION
     ============================================================ */
     .results-section {
-      margin-top: 28px;
+      margin-top: 24px;
     }
 
     .results-heading {
-      font-size: 18px;
-      font-weight: 800;
-      color: var(--gray-800);
-      text-align: center;
-      margin-bottom: 16px;
-      letter-spacing: -0.3px;
+      font-family: 'Kalam', cursive;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--ink-blue);
+      padding-left: var(--margin-x);
+      margin-bottom: 14px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid var(--ink-blue-light);
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .result-card {
       background: var(--white);
       border-radius: var(--radius);
-      padding: 18px 18px 16px;
-      margin-bottom: 12px;
-      box-shadow: var(--shadow);
-      border-left: 5px solid var(--gray-300);
+      padding: 16px 16px 14px;
+      margin-bottom: 10px;
+      box-shadow: var(--shadow-lift);
+      border-left: 4px solid var(--line-color);
       opacity: 0;
-      animation: slideUp 0.32s ease forwards;
+      animation: slideUp 0.28s ease forwards;
+      position: relative;
     }
 
     .result-card:nth-child(1) { animation-delay: 0.00s; }
@@ -419,84 +498,105 @@
     .result-card:nth-child(3) { animation-delay: 0.14s; }
 
     .result-card.winner {
-      background: var(--orange-pale);
-      border-left-color: var(--orange);
-      box-shadow: 0 4px 20px rgba(201, 168, 76, 0.18);
+      background: var(--highlight-bg);
+      border-left-color: var(--ink-blue);
+      box-shadow: var(--shadow-lift);
+    }
+
+    /* Yellow highlighter swipe on winner */
+    .result-card.winner::after {
+      content: '';
+      position: absolute;
+      top: 14px; left: 14px; right: 14px;
+      height: 22px;
+      background: var(--highlight);
+      border-radius: 2px;
+      z-index: 0;
     }
 
     .result-card-top {
       display: flex;
       align-items: flex-start;
       justify-content: space-between;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
       gap: 8px;
+      position: relative;
+      z-index: 1;
     }
 
     .result-name {
-      font-size: 16px;
+      font-family: 'Kalam', cursive;
+      font-size: 17px;
       font-weight: 700;
-      color: var(--text);
-      line-height: 1.3;
+      color: var(--ink);
+      line-height: 1.2;
       flex: 1;
     }
 
     .badge-winner {
-      background: var(--green-dark);
-      color: var(--orange-light);
-      font-size: 10px;
+      font-family: 'Kalam', cursive;
+      background: var(--ink-blue);
+      color: var(--paper);
+      font-size: 11px;
       font-weight: 700;
-      padding: 4px 10px;
-      border-radius: 4px;
-      letter-spacing: 1.2px;
+      padding: 3px 10px;
+      border-radius: 3px;
+      letter-spacing: 0.5px;
       white-space: nowrap;
       flex-shrink: 0;
+      position: relative;
+      z-index: 1;
     }
 
     .result-per-unit {
-      font-size: 30px;
-      font-weight: 800;
-      color: var(--green-mid);
+      font-family: 'Kalam', cursive;
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--ink-blue);
       line-height: 1;
-      margin-bottom: 5px;
-      letter-spacing: -0.5px;
+      margin-bottom: 4px;
+      position: relative;
+      z-index: 1;
     }
 
     .result-card.winner .result-per-unit {
-      color: var(--orange-dark);
+      color: var(--ink-blue);
     }
 
     .result-unit-label {
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--gray-500);
+      font-family: 'Kalam', cursive;
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--ink-faded);
       margin-left: 2px;
     }
 
     .result-original {
+      font-family: 'Kalam', cursive;
       font-size: 13px;
-      color: var(--gray-500);
+      color: var(--ink-faded);
       margin-top: 2px;
     }
 
     .result-savings {
-      margin-top: 10px;
-      padding-top: 10px;
-      border-top: 1px solid var(--gray-200);
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px dashed var(--line-color);
+      font-family: 'Kalam', cursive;
       font-size: 13px;
-      font-weight: 500;
-      color: var(--gray-600);
+      font-weight: 400;
+      color: var(--ink-mid);
       line-height: 1.4;
     }
 
     .mixed-unit-notice {
-      background: #FFF9C4;
-      color: #795548;
-      border-left: 4px solid #FDD835;
-      border-radius: var(--radius-sm);
-      padding: 12px 14px;
+      background: #fffbe6;
+      color: #7a6020;
+      border-left: 3px solid #d4a843;
+      padding: 10px 14px;
+      font-family: 'Kalam', cursive;
       font-size: 13px;
-      font-weight: 500;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
       line-height: 1.4;
     }
 
@@ -504,132 +604,149 @@
        GROCERY LIST TAB
     ============================================================ */
     .list-section {
-      padding-top: 20px;
+      padding-top: 18px;
     }
 
     .list-add-row {
       display: flex;
       gap: 8px;
-      margin-bottom: 20px;
+      margin-bottom: 18px;
+      padding-left: var(--margin-x);
     }
 
     .list-add-row .field-input {
       flex: 1;
-      height: 52px;
     }
 
     .btn-add {
-      height: 52px;
-      padding: 0 20px;
-      background: var(--green-dark);
-      color: var(--orange-light);
-      border: 1px solid var(--orange);
+      width: 44px;
+      height: 44px;
+      background: var(--ink-blue);
+      color: var(--paper);
+      border: none;
       border-radius: var(--radius-sm);
-      font-size: 22px;
-      font-weight: 400;
+      font-size: 24px;
+      font-weight: 300;
       cursor: pointer;
       flex-shrink: 0;
-      transition: background 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 2px 3px 0px var(--ink-blue-mid);
+      transition: transform 0.1s, box-shadow 0.1s;
       -webkit-tap-highlight-color: transparent;
       line-height: 1;
     }
 
     .btn-add:active {
-      background: var(--green-mid);
+      transform: translate(1px, 2px);
+      box-shadow: 1px 1px 0px var(--ink-blue-mid);
     }
 
     .list-empty {
       text-align: center;
       padding: 40px 20px;
-      color: var(--gray-400);
+      color: var(--line-color);
     }
 
     .list-empty-icon {
-      font-size: 40px;
+      font-size: 36px;
       display: block;
       margin-bottom: 10px;
     }
 
     .list-empty-text {
-      font-size: 14px;
-      font-weight: 500;
+      font-family: 'Kalam', cursive;
+      font-size: 15px;
+      font-weight: 300;
+      color: var(--ink-faded);
+      line-height: 1.6;
     }
 
-    /* Each grocery item row */
+    .list-count {
+      font-family: 'Kalam', cursive;
+      font-size: 12px;
+      color: var(--ink-faded);
+      padding-left: var(--margin-x);
+      margin-bottom: 8px;
+      letter-spacing: 0.4px;
+    }
+
+    /* Each to-do row */
     .list-item {
       display: flex;
       align-items: center;
       gap: 10px;
-      background: var(--white);
-      border-radius: var(--radius-sm);
-      padding: 14px 14px 14px 16px;
-      margin-bottom: 8px;
-      box-shadow: var(--shadow-sm);
-      border-left: 3px solid var(--gray-300);
-      animation: slideUp 0.25s ease forwards;
+      padding: 0 12px 0 calc(var(--margin-x) + 8px);
+      min-height: var(--line-gap);
+      border-bottom: 1px solid var(--line-color);
       opacity: 0;
+      animation: slideUp 0.22s ease forwards;
+    }
+
+    /* Checkbox circle */
+    .list-item::before {
+      content: '';
+      flex-shrink: 0;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 1.5px solid var(--ink-blue-light);
+      background: transparent;
     }
 
     .list-item-name {
       flex: 1;
-      font-size: 15px;
-      font-weight: 600;
-      color: var(--text);
+      font-family: 'Kalam', cursive;
+      font-size: 16px;
+      font-weight: 400;
+      color: var(--ink);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
     .btn-list-compare {
-      height: 36px;
-      padding: 0 14px;
-      background: var(--orange-pale);
-      color: var(--orange-dark);
-      border: 1px solid var(--orange);
-      border-radius: 6px;
+      font-family: 'Kalam', cursive;
       font-size: 12px;
       font-weight: 700;
-      letter-spacing: 0.8px;
-      text-transform: uppercase;
+      color: var(--ink-blue);
+      background: transparent;
+      border: 1.5px solid var(--ink-blue-light);
+      border-radius: var(--radius-sm);
+      padding: 3px 10px;
       cursor: pointer;
       white-space: nowrap;
       flex-shrink: 0;
-      transition: background 0.15s;
+      transition: background 0.15s, color 0.15s;
       -webkit-tap-highlight-color: transparent;
     }
 
     .btn-list-compare:active {
-      background: var(--orange-light);
+      background: var(--ink-blue);
+      color: var(--paper);
     }
 
     .btn-list-remove {
-      height: 36px;
-      width: 36px;
+      font-family: 'Kalam', cursive;
+      font-size: 18px;
+      font-weight: 300;
+      color: var(--line-color);
       background: transparent;
-      color: var(--gray-400);
-      border: 1px solid var(--gray-300);
-      border-radius: 6px;
-      font-size: 16px;
+      border: none;
       cursor: pointer;
       flex-shrink: 0;
+      width: 28px;
+      height: 28px;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: color 0.15s, border-color 0.15s;
+      transition: color 0.15s;
       -webkit-tap-highlight-color: transparent;
     }
 
     .btn-list-remove:active {
-      color: #B71C1C;
-      border-color: #EF5350;
-    }
-
-    .list-count {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--gray-500);
-      letter-spacing: 0.5px;
-      margin-bottom: 12px;
+      color: var(--ink-red);
     }
 
     /* ============================================================
@@ -641,7 +758,7 @@
        ANIMATIONS
     ============================================================ */
     @keyframes slideUp {
-      from { opacity: 0; transform: translateY(14px); }
+      from { opacity: 0; transform: translateY(12px); }
       to   { opacity: 1; transform: translateY(0); }
     }
 
@@ -649,98 +766,110 @@
 </head>
 <body>
 
-  <!-- =====================================================
-       APP HEADER
-  ====================================================== -->
-  <header class="app-header">
-    <span class="header-logo">🛒</span>
-    <div class="header-title">TindaCheck</div>
-    <div class="header-subtitle">Find the best deal — instantly</div>
-  </header>
+  <div class="notepad">
 
-  <!-- =====================================================
-       TAB NAVIGATION
-  ====================================================== -->
-  <nav class="tab-nav" role="tablist">
-    <button class="tab-btn active" id="tab-btn-compare"
-            onclick="switchTab('compare')" role="tab" aria-selected="true">
-      Compare
-    </button>
-    <button class="tab-btn" id="tab-btn-list"
-            onclick="switchTab('list')" role="tab" aria-selected="false">
-      My List
-    </button>
-  </nav>
+    <!-- Spiral binding -->
+    <div class="notepad-binding">
+      <span class="ring-hole"></span>
+      <span class="ring-hole"></span>
+      <span class="ring-hole"></span>
+      <span class="ring-hole"></span>
+      <span class="ring-hole"></span>
+      <span class="ring-hole"></span>
+      <span class="ring-hole"></span>
+      <span class="ring-hole"></span>
+    </div>
 
-  <div class="container">
+    <div class="notepad-page">
 
-    <!-- =====================================================
-         COMPARE TAB
-    ====================================================== -->
-    <div id="tab-compare" role="tabpanel">
+      <!-- =====================================================
+           APP HEADER
+      ====================================================== -->
+      <header class="app-header">
+        <span class="header-logo">🛒</span>
+        <div class="header-title">TindaCheck</div>
+        <div class="header-subtitle">Find the best deal — instantly</div>
+      </header>
 
-      <div class="toggle-section">
-        <span class="toggle-label">Compare</span>
-        <div class="toggle-group" role="group" aria-label="Number of products to compare">
-          <button class="toggle-btn active" id="btn2"
-                  onclick="setProductCount(2)" aria-pressed="true">
-            2 Items
+      <!-- =====================================================
+           TAB NAVIGATION
+      ====================================================== -->
+      <nav class="tab-nav" role="tablist">
+        <button class="tab-btn active" id="tab-btn-compare"
+                onclick="switchTab('compare')" role="tab" aria-selected="true">
+          Compare
+        </button>
+        <button class="tab-btn" id="tab-btn-list"
+                onclick="switchTab('list')" role="tab" aria-selected="false">
+          My List
+        </button>
+      </nav>
+
+      <div class="container">
+
+        <!-- =====================================================
+             COMPARE TAB
+        ====================================================== -->
+        <div id="tab-compare" role="tabpanel">
+
+          <div class="toggle-section">
+            <span class="toggle-label">Compare</span>
+            <div class="toggle-group" role="group" aria-label="Number of products to compare">
+              <button class="toggle-btn active" id="btn2"
+                      onclick="setProductCount(2)" aria-pressed="true">
+                2 Items
+              </button>
+              <button class="toggle-btn" id="btn3"
+                      onclick="setProductCount(3)" aria-pressed="false">
+                3 Items
+              </button>
+            </div>
+          </div>
+
+          <div id="products-container"></div>
+
+          <button class="btn-compare" onclick="compare()">
+            ✏️ Compare Prices
           </button>
-          <button class="toggle-btn" id="btn3"
-                  onclick="setProductCount(3)" aria-pressed="false">
-            3 Items
-          </button>
-        </div>
-      </div>
 
-      <div id="products-container"></div>
+          <div id="error-banner" class="error-banner hidden" role="alert"></div>
 
-      <button class="btn-compare" onclick="compare()">
-        Compare Prices
-      </button>
+          <section id="results-section" class="results-section hidden" aria-live="polite">
+            <div class="results-heading">📊 Results</div>
+            <div id="results-container"></div>
+            <button class="btn-reset" onclick="resetApp()">↩ New Comparison</button>
+          </section>
 
-      <div id="error-banner" class="error-banner hidden" role="alert"></div>
+        </div><!-- /tab-compare -->
 
-      <section id="results-section" class="results-section hidden" aria-live="polite">
-        <div class="results-heading">Results</div>
-        <div id="results-container"></div>
-        <button class="btn-reset" onclick="resetApp()">↩ New Comparison</button>
-      </section>
+        <!-- =====================================================
+             MY LIST TAB
+        ====================================================== -->
+        <div id="tab-list" class="hidden" role="tabpanel">
+          <div class="list-section">
 
-    </div><!-- /tab-compare -->
+            <div class="list-add-row">
+              <input class="field-input" type="text" id="list-input"
+                     placeholder="Add an item..."
+                     autocomplete="off" autocorrect="off" spellcheck="false"
+                     onkeydown="if(event.key==='Enter') addListItem()" />
+              <button class="btn-add" onclick="addListItem()" aria-label="Add item">+</button>
+            </div>
 
-    <!-- =====================================================
-         MY LIST TAB
-    ====================================================== -->
-    <div id="tab-list" class="hidden" role="tabpanel">
+            <div id="list-count" class="list-count hidden"></div>
+            <div id="list-container"></div>
 
-      <div class="list-section">
+            <div id="list-empty" class="list-empty">
+              <span class="list-empty-icon">📋</span>
+              <div class="list-empty-text">Your list is empty.<br>Add items above to get started.</div>
+            </div>
 
-        <!-- Add item input -->
-        <div class="list-add-row">
-          <input class="field-input" type="text" id="list-input"
-                 placeholder="e.g. Cooking oil, Rice, Sardines"
-                 autocomplete="off" autocorrect="off" spellcheck="false"
-                 onkeydown="if(event.key==='Enter') addListItem()" />
-          <button class="btn-add" onclick="addListItem()" aria-label="Add item">+</button>
-        </div>
+          </div>
+        </div><!-- /tab-list -->
 
-        <!-- Item count -->
-        <div id="list-count" class="list-count hidden"></div>
-
-        <!-- Items -->
-        <div id="list-container"></div>
-
-        <!-- Empty state -->
-        <div id="list-empty" class="list-empty">
-          <span class="list-empty-icon">📋</span>
-          <div class="list-empty-text">Your list is empty.<br>Add items above to get started.</div>
-        </div>
-
-      </div>
-    </div><!-- /tab-list -->
-
-  </div><!-- /container -->
+      </div><!-- /container -->
+    </div><!-- /notepad-page -->
+  </div><!-- /notepad -->
 
 
   <script>
@@ -794,18 +923,12 @@
       renderList();
     }
 
-    /**
-     * Switch to the Compare tab and pre-fill Product 1's name field
-     * with the tapped grocery item.
-     */
     function compareItem(name) {
       switchTab('compare');
-      // Small delay so the tab panel is visible before we write to the input
       setTimeout(() => {
         const nameInput = document.getElementById('name-0');
         if (nameInput) {
           nameInput.value = name;
-          // Scroll to and focus the price field so user can start entering data
           const priceInput = document.getElementById('price-0');
           if (priceInput) {
             priceInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -1031,7 +1154,7 @@
           <div class="result-card ${isWinner ? 'winner' : ''}">
             <div class="result-card-top">
               <div class="result-name">${escapeHTML(p.name)}</div>
-              ${isWinner ? '<span class="badge-winner">🏆 BEST DEAL</span>' : ''}
+              ${isWinner ? '<span class="badge-winner">🏆 Best Deal</span>' : ''}
             </div>
             <div class="result-per-unit">
               ${priceStr}<span class="result-unit-label">${label}</span>
