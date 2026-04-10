@@ -756,6 +756,20 @@
       flex-shrink: 0;
     }
 
+    .result-packaging {
+      display: inline-block;
+      margin-left: 8px;
+      padding: 2px 8px;
+      background: var(--gray-200);
+      color: var(--gray-600);
+      font-size: 11px;
+      font-weight: 600;
+      border-radius: 4px;
+      letter-spacing: 0.5px;
+      text-transform: capitalize;
+      vertical-align: middle;
+    }
+
     /* ============================================================
        HINT TEXT & LIVE TOTAL
     ============================================================ */
@@ -1251,6 +1265,21 @@
               </div>
             </div>
 
+            <!-- 1b. Packaging (optional) -->
+            <div class="field-group">
+              <label class="field-label" for="pkg-${i}">Packaging <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
+              <select class="field-select" id="pkg-${i}">
+                <option value="">— none —</option>
+                <option value="bottle"     ${(saved.packaging||'')==='bottle'     ? 'selected':''}>Bottle</option>
+                <option value="tetra pack" ${(saved.packaging||'')==='tetra pack' ? 'selected':''}>Tetra Pack</option>
+                <option value="sachet"     ${(saved.packaging||'')==='sachet'     ? 'selected':''}>Sachet</option>
+                <option value="can"        ${(saved.packaging||'')==='can'        ? 'selected':''}>Can</option>
+                <option value="pouch"      ${(saved.packaging||'')==='pouch'      ? 'selected':''}>Pouch</option>
+                <option value="bag"        ${(saved.packaging||'')==='bag'        ? 'selected':''}>Bag</option>
+                <option value="box"        ${(saved.packaging||'')==='box'        ? 'selected':''}>Box</option>
+              </select>
+            </div>
+
             <!-- 2. Size + Unit side by side -->
             <div class="field-row">
               <div class="field-group">
@@ -1332,11 +1361,12 @@
         const nameEl = document.getElementById(`name-${i}`);
         if (!nameEl) return;
         productData[i] = {
-          name:  nameEl.value,
-          size:  document.getElementById(`size-${i}`).value,
-          unit:  document.getElementById(`unit-${i}`).value,
-          packs: document.getElementById(`packs-${i}`).value,
-          price: document.getElementById(`price-${i}`).value,
+          name:      nameEl.value,
+          packaging: document.getElementById(`pkg-${i}`).value,
+          size:      document.getElementById(`size-${i}`).value,
+          unit:      document.getElementById(`unit-${i}`).value,
+          packs:     document.getElementById(`packs-${i}`).value,
+          price:     document.getElementById(`price-${i}`).value,
         };
       });
     }
@@ -1373,12 +1403,13 @@
       const products = [];
 
       for (let i = 0; i < productData.length; i++) {
-        const nameRaw = document.getElementById(`name-${i}`).value.trim();
-        const name    = nameRaw || `Product ${i + 1}`;
-        const size    = parseFloat(document.getElementById(`size-${i}`).value);
-        const unit    = document.getElementById(`unit-${i}`).value;
-        const packs   = parseFloat(document.getElementById(`packs-${i}`).value) || 1;
-        const price   = parseFloat(document.getElementById(`price-${i}`).value);
+        const nameRaw   = document.getElementById(`name-${i}`).value.trim();
+        const name      = nameRaw || `Product ${i + 1}`;
+        const packaging = document.getElementById(`pkg-${i}`).value;
+        const size      = parseFloat(document.getElementById(`size-${i}`).value);
+        const unit      = document.getElementById(`unit-${i}`).value;
+        const packs     = parseFloat(document.getElementById(`packs-${i}`).value) || 1;
+        const price     = parseFloat(document.getElementById(`price-${i}`).value);
 
         if (isNaN(size) || size <= 0) {
           showError(`⚠️ Please enter a valid size/amount for ${name}.`);
@@ -1393,7 +1424,7 @@
 
         const family  = unitFamily(unit);
         const perUnit = pricePerUnit(price, size, unit, packs);
-        products.push({ name, price, size, packs, unit, family, perUnit });
+        products.push({ name, packaging, price, size, packs, unit, family, perUnit });
       }
 
       const families   = [...new Set(products.map(p => p.family))];
@@ -1461,7 +1492,9 @@
         container.insertAdjacentHTML('beforeend', `
           <div class="result-card ${mixedUnits ? '' : tierClass}">
             <div class="result-card-top">
-              <div class="result-name">${escapeHTML(p.name)}</div>
+              <div class="result-name">
+                ${escapeHTML(p.name)}${p.packaging ? `<span class="result-packaging">${escapeHTML(p.packaging)}</span>` : ''}
+              </div>
               ${badge}
             </div>
             <div class="result-per-unit">
